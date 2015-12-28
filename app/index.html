@@ -11,7 +11,7 @@
 </head>
 <body ng-controller="mainCtrl">
 
-<div class="grid">
+<div class="grid" ng-cloak>
   <div class="col" ng-repeat="col in grid.grid">
     <div class="row" ng-repeat="row in col track by $index">
       {{ row }} hello
