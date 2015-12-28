@@ -1,7 +1,7 @@
 {
   "name": "xmas-challenge",
   "version": "1.0.0",
-  "description": "Lendable christmas challeng. Let's win it :)",
+  "description": "Lendable christmas challenge. Let's win it :)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,7 +25,7 @@
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
     "gulp-concat": "^2.6.0",
-    "gulp-sourcemaps": "^1.6.0",
-    "gulp-watch": "^4.3.5"
+    "gulp-load-plugins": "^1.1.0",
+    "gulp-sourcemaps": "^1.6.0"
   }
 }

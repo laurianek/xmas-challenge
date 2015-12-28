@@ -1,21 +1,18 @@
 
 const gulp = require('gulp');
-const sourcemaps = require('gulp-sourcemaps');
-const babel = require('gulp-babel');
-const concat = require('gulp-concat');
-const watch = require('gulp-watch');
-const taskListing = require('gulp-task-listing');
+const gulpLoadPlugins = require('gulp-load-plugins');
+const plugins = gulpLoadPlugins();
 
-gulp.task('default', taskListing);
+gulp.task('default', plugins.taskListing);
 
 gulp.task('js', function() {
   return gulp.src('app/**/*.js')
-    .pipe(sourcemaps.init())
-    .pipe(babel({
+    .pipe(plugins.sourcemaps.init())
+    .pipe(plugins.babel({
       presets: ['es2015']
     }))
-    .pipe(concat('main.js'))
-    .pipe(sourcemaps.write('.'))
+    .pipe(plugins.concat('main.js'))
+    .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest('dist'));
 });
 
