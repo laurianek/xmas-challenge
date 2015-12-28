@@ -1,0 +1,2 @@
+.grid{display:table;width:50%}.grid .col{display:table-row}.grid .col:first-child .row{border-top:none}.grid .row{display:table-cell;border-top:3px solid #000;border-left:3px solid #000}.grid .row:first-child{border-left:none}
+/*# sourceMappingURL=main.css.map */

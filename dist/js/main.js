@@ -6,7 +6,7 @@ app.controller('mainCtrl', function ($scope) {
   $scope.grid = new Grid();
   $scope.player1 = new Player('Player 1');
 
-  console.log($scope.grid, $scope.player1);
+  console.log($scope.grid, $scope.player1, 'hello');
 });
 'use strict';
 
