@@ -9,7 +9,13 @@
 </head>
 <body ng-controller="mainCtrl">
 
-
+<div class="grid">
+  <div class="col" ng-repeat="col in grid.grid">
+    <div class="row" ng-repeat="row in col track by $index">
+      {{ row }} hello
+    </div>
+  </div>
+</div>
 
 
 <script src="../bower_components/angular/angular.js"></script>
