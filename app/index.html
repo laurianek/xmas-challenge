@@ -14,7 +14,9 @@
 <div class="grid" ng-cloak>
   <div class="col" ng-repeat="col in grid.grid">
     <div class="row" ng-repeat="row in col track by $index">
-      {{ row }} hello
+      <span class="cell" ng-class="row?row.class : ''">
+        <span></span>
+      </span>
     </div>
   </div>
 </div>
