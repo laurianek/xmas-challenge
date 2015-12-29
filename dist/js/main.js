@@ -46,6 +46,7 @@ app.controller('mainCtrl', function ($scope, GameConst) {
       //notify the user that marking failed
       return;
     }
+    console.log(success);
     //check if won (only check for the last game move, be lazy)
     changePlayer();
   }
@@ -92,8 +93,9 @@ var Grid = (function () {
         return false;
       }
       this.grid[position.row][position.col] = marker;
-      this.gameOver = this.gameWon(position).isGameWon;
-      return true;
+      var game = this.gameWon(position);
+      this.gameOver = game.isGameWon;
+      return game;
     }
   }, {
     key: 'withinGridBounds',
@@ -106,73 +108,57 @@ var Grid = (function () {
       return this.grid[position.row][position.col];
     }
   }, {
-    key: 'gameWon',
-    value: function gameWon(position) {
-      var currentMark = this.isAlreayMarked(position);
-      var lWin = this.linearWin(position, currentMark);
-      var dWin = this.diagonalWin(position, currentMark);
-      console.log(lWin, dWin);
-      if (lWin || dWin) {
-        return {
-          isGameWon: true,
-          winType: dWin ? dWin : lWin
-        };
-      }
-      return {
-        isGameWon: false,
-        winType: ''
-      };
-    }
-  }, {
-    key: 'linearWin',
-    value: function linearWin(position, mark) {
-      var colWin = true;
-      var rowWin = true;
-      var cell1, cell2;
-      for (var i = 0; i < this.square; i++) {
-        cell1 = this.grid[position.row][i];
-        cell2 = this.grid[i][position.col];
-        if (!cell1 || cell1.symbol !== mark.symbol) {
-          rowWin = false;
-        }
-        if (!cell2 || cell2.symbol !== mark.symbol) {
-          colWin = false;
-        }
-      }
-      if (colWin) {
-        return Grid.enum().VT_WIN;
-      }
-      if (rowWin) {
-        return Grid.enum().HZ_WIN;
-      }
-      return false;
-    }
-  }, {
-    key: 'diagonalWin',
-    value: function diagonalWin(position, mark) {
-      if (position.row != position.col) {
+    key: 'winReduceFn',
+    value: function winReduceFn(position, mark, fns) {
+      if (fns.extraCheck && fns.extraCheck(position)) {
         return false;
       }
-      var lhdWin = true;
-      var rhdWin = true;
-      var cell1, cell2;
-      for (var i = 0, j = this.square; i < this.square; i++, j--) {
-        cell1 = this.grid[i][i];
-        cell2 = this.grid[i][j];
-        if (!cell1 || cell1.symbol !== mark.symbol) {
-          lhdWin = false;
-        }
-        if (!cell2 || cell2.symbol !== mark.symbol) {
-          rhdWin = false;
+      for (var i = 0, j = this.square - 1, cell; i < this.square; i++, j--) {
+        cell = fns.cell(position, i, j);
+        console.log('cell', cell);
+        if (!cell || cell.symbol !== mark.symbol) {
+          return false;
         }
       }
-      if (lhdWin) {
-        return Grid.enum().LHD_WIN;
+      return fns.returnValue;
+    }
+  }, {
+    key: 'gameWon',
+    value: function gameWon(position) {
+      var _this = this;
+      var currentMark = this.isAlreayMarked(position);
+      var checks = [{
+        cell: function hzw(position, i, j) {
+          return _this.grid[position.row][i];
+        },
+        returnValue: Grid.enum().HZ_WIN
+      }, {
+        cell: function vtw(position, i, j) {
+          return _this.grid[i][position.col];
+        },
+        returnValue: Grid.enum().VT_WIN
+      }, {
+        cell: function lhdw(position, i, j) {
+          return _this.grid[i][i];
+        },
+        returnValue: Grid.enum().LHD_WIN
+      }, {
+        cell: function rhdw(position, i, j) {
+          return _this.grid[i][j];
+        },
+        returnValue: Grid.enum().RHD_WIN
+      }];
+      var win = checks.reduce(function (previousValue, currentObj) {
+        if (previousValue) {
+          return previousValue;
+        }
+        return _this.winReduceFn(position, currentMark, currentObj);
+      }, false);
+      console.log(win);
+      if (win) {
+        return { isGameWon: true, winType: win };
       }
-      if (rhdWin) {
-        return Grid.enum().RHD_WIN;
-      }
-      return false;
+      return { isGameWon: false, winType: '' };
     }
   }], [{
     key: 'enum',
