@@ -6,7 +6,9 @@ app.constant('GameConst', {
   NOUGHT: 'nought',
   CROSS: 'cross',
   NOUGHT_CLASS: 'symbol-nought',
-  CROSS_CLASS: 'symbol-cross'
+  CROSS_CLASS: 'symbol-cross',
+  WIN_POINT: 1,
+  DRAW_POINT: 0.5
 });
 
 app.controller('mainCtrl', function ($scope, GameConst) {
@@ -30,24 +32,17 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = mark;
 
-  /*
-  var playerTurn = player1;
-  grid onclick(function() {
-    mark grid;
-    check if won (only check for the last game move, be lazy)
-    if won then give score and end game;
-    else next player turn;
-  })
-  // */
-
   function mark(row, col) {
     var success = grid.mark({ row: row, col: col }, currentPlayer().marker);
     if (!success) {
-      //notify the user that marking failed
+      //maybe notify the user that marking failed
       return;
     }
-    console.log(success);
-    //check if won (only check for the last game move, be lazy)
+    if (success.isGameWon) {
+      currentPlayer().addPoints(GameConst.WIN_POINT);
+      //display message thw current player win and ask for replay
+      return;
+    }
     changePlayer();
   }
   function currentPlayer() {
@@ -108,8 +103,8 @@ var Grid = (function () {
       return this.grid[position.row][position.col];
     }
   }, {
-    key: 'winReduceFn',
-    value: function winReduceFn(position, mark, fns) {
+    key: 'winReduce',
+    value: function winReduce(position, mark, fns) {
       if (fns.extraCheck && fns.extraCheck(position)) {
         return false;
       }
@@ -141,18 +136,24 @@ var Grid = (function () {
         cell: function lhdw(position, i, j) {
           return _this.grid[i][i];
         },
+        extraCheck: function extraCheck(position) {
+          return position.row !== position.col;
+        },
         returnValue: Grid.enum().LHD_WIN
       }, {
         cell: function rhdw(position, i, j) {
           return _this.grid[i][j];
         },
+        extraCheck: function extraCheck(position) {
+          return position.row !== _this.square - 1 - position.col;
+        },
         returnValue: Grid.enum().RHD_WIN
       }];
-      var win = checks.reduce(function (previousValue, currentObj) {
+      var win = checks.reduce(function winReduceFn(previousValue, currentObj) {
         if (previousValue) {
           return previousValue;
         }
-        return _this.winReduceFn(position, currentMark, currentObj);
+        return _this.winReduce(position, currentMark, currentObj);
       }, false);
       console.log(win);
       if (win) {
@@ -203,4 +204,41 @@ var Player = (function () {
 
   return Player;
 })();
+'use strict';
+
+// Production steps of ECMA-262, Edition 5, 15.4.4.21
+// Reference: http://es5.github.io/#x15.4.4.21
+if (!Array.prototype.reduce) {
+  Array.prototype.reduce = function (callback /*, initialValue*/) {
+    'use strict';
+
+    if (this == null) {
+      throw new TypeError('Array.prototype.reduce called on null or undefined');
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError(callback + ' is not a function');
+    }
+    var t = Object(this),
+        len = t.length >>> 0,
+        k = 0,
+        value;
+    if (arguments.length == 2) {
+      value = arguments[1];
+    } else {
+      while (k < len && !(k in t)) {
+        k++;
+      }
+      if (k >= len) {
+        throw new TypeError('Reduce of empty array with no initial value');
+      }
+      value = t[k++];
+    }
+    for (; k < len; k++) {
+      if (k in t) {
+        value = callback(value, t[k], k, t);
+      }
+    }
+    return value;
+  };
+}
 //# sourceMappingURL=main.js.map

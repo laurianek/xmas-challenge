@@ -31,7 +31,7 @@ class Grid {
   isAlreayMarked(position) {
     return this.grid[position.row][position.col];
   }
-  winReduceFn(position, mark, fns) {
+  winReduce(position, mark, fns) {
     if(fns.extraCheck && fns.extraCheck(position)) {
       return false;
     }
@@ -58,18 +58,20 @@ class Grid {
       },
       {
         cell: function lhdw(position, i, j) { return _this.grid[i][i]; },
+        extraCheck: function extraCheck(position) { return position.row !== position.col },
         returnValue: Grid.enum().LHD_WIN
       },
       {
         cell: function rhdw(position, i, j) { return _this.grid[i][j]; },
+        extraCheck: function extraCheck(position) { return position.row !== _this.square - 1 - position.col },
         returnValue: Grid.enum().RHD_WIN
       }
     ];
-    var win = checks.reduce(function(previousValue, currentObj) {
+    var win = checks.reduce(function winReduceFn(previousValue, currentObj) {
       if (previousValue) {
         return previousValue;
       }
-      return _this.winReduceFn(position, currentMark, currentObj);
+      return _this.winReduce(position, currentMark, currentObj);
     }, false);
     console.log(win);
     if (win) {

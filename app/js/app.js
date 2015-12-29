@@ -6,7 +6,9 @@ app.constant('GameConst', {
   NOUGHT: 'nought',
   CROSS: 'cross',
   NOUGHT_CLASS: 'symbol-nought',
-  CROSS_CLASS: 'symbol-cross'
+  CROSS_CLASS: 'symbol-cross',
+  WIN_POINT: 1,
+  DRAW_POINT: 0.5
 });
 
 app.controller('mainCtrl', function($scope, GameConst) {
@@ -30,23 +32,17 @@ app.controller('mainCtrl', function($scope, GameConst) {
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = mark;
 
-  /*
-  var playerTurn = player1;
-  grid onclick(function() {
-    mark grid;
-    check if won (only check for the last game move, be lazy)
-    if won then give score and end game;
-    else next player turn;
-  })
-  // */
-
   function mark(row, col) {
     var success = grid.mark({row: row, col: col}, currentPlayer().marker);
     if(!success) {
-      //notify the user that marking failed
+      //maybe notify the user that marking failed
       return;
     }
-    //check if won (only check for the last game move, be lazy)
+    if (success.isGameWon) {
+      currentPlayer().addPoints(GameConst.WIN_POINT);
+      //display message thw current player win and ask for replay
+      return;
+    }
     changePlayer();
   }
   function currentPlayer() {
