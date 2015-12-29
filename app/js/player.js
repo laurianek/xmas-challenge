@@ -6,4 +6,11 @@ class Player {
     this.marker = marker;
     this.score = score;
   }
+
+  addPoints(_point) {
+    var point = Number(_point);
+    if(point) {
+      this.score += point
+    }
+  }
 }

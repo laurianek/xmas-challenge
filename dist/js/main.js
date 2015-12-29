@@ -10,7 +10,7 @@ app.constant('GameConst', {
 });
 
 app.controller('mainCtrl', function ($scope, GameConst) {
-  $scope.grid = new Grid();
+  var grid = new Grid();
   var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
@@ -19,13 +19,15 @@ app.controller('mainCtrl', function ($scope, GameConst) {
     symbol: GameConst.CROSS,
     _class: GameConst.CROSS_CLASS
   });
+  var isPlayer1Turn = true;
+  $scope.grid = grid;
   $scope.players = [player1, player2];
-
   $scope.config = {
     colour: 'colour',
     symbol: 'marker',
     score: 'score'
   };
+  $scope.isCurrentPlayer = isCurrentPlayer;
 
   /*
   var playerTurn = player1;
@@ -37,7 +39,26 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   })
   // */
 
-  console.log($scope.grid, $scope.player1);
+  function mark(row, col) {
+    var success = grid.mark({ row: row, col: col }, currentPlayer().marker);
+    if (!success) {
+      //notify the user that marking failed
+      return;
+    }
+    //check if won (only check for the last game move, be lazy)
+    changePlayer();
+  }
+  function currentPlayer() {
+    return isPlayer1Turn ? player1 : player2;
+  }
+  function changePlayer() {
+    return isPlayer1Turn = !isPlayer1Turn;
+  }
+  function isCurrentPlayer(player) {
+    return player.marker === currentPlayer().marker;
+  }
+
+  console.log($scope.grid, $scope.players);
 });
 'use strict';
 
@@ -78,24 +99,37 @@ var Grid = (function () {
     value: function withinGridBounds(position) {
       return position.row >= 0 && position.row < this.row && position.col >= 0 && position.col < this.col;
     }
-  }, {
-    key: 'draw',
-    value: function draw() {}
   }]);
 
   return Grid;
 })();
 'use strict';
 
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Player = function Player(name, marker) {
-  var score = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+var Player = (function () {
+  function Player(name, marker) {
+    var score = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 
-  _classCallCheck(this, Player);
+    _classCallCheck(this, Player);
 
-  this.name = name;
-  this.marker = marker;
-  this.score = score;
-};
+    this.name = name;
+    this.marker = marker;
+    this.score = score;
+  }
+
+  _createClass(Player, [{
+    key: 'addPoints',
+    value: function addPoints(_point) {
+      var point = Number(_point);
+      if (point) {
+        this.score += point;
+      }
+    }
+  }]);
+
+  return Player;
+})();
 //# sourceMappingURL=main.js.map

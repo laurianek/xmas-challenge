@@ -23,7 +23,4 @@ class Grid {
     return (position.row >= 0 && position.row < this.row) &&
       (position.col >= 0 && position.col < this.col);
   }
-  draw() {
-
-  }
 }
