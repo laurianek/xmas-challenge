@@ -5,6 +5,7 @@ class Grid {
     this.square = square;
     this.grid = [];
     this.gameOver = false;
+    this.freeCell = Math.pow(this.square, 2);
     for (let row = 0; row < this.square; row++) {
       this.grid[row] = [];
       for (let col = 0; col < this.square; col++) {
@@ -20,8 +21,10 @@ class Grid {
       return false;
     }
     this.grid[position.row][position.col] = marker;
+    this.freeCell--;
     var game = this.gameWon(position);
-    this.gameOver = game.isGameWon;
+    game.isGameOver = 0 === this.freeCell;
+    this.gameOver = game.isGameWon || game.isGameOver;
     return game;
   }
   withinGridBounds(position) {
@@ -37,7 +40,6 @@ class Grid {
     }
     for (let i = 0, j = this.square-1, cell; i < this.square; i++, j--) {
       cell = fns.cell(position, i, j);
-      console.log('cell', cell);
       if (!cell || cell.symbol !== mark.symbol) {
         return false;
       }
@@ -58,12 +60,12 @@ class Grid {
       },
       {
         cell: function lhdw(position, i, j) { return _this.grid[i][i]; },
-        extraCheck: function extraCheck(position) { return position.row !== position.col },
+        extraCheck(position) { return position.row !== position.col },
         returnValue: Grid.enum().LHD_WIN
       },
       {
         cell: function rhdw(position, i, j) { return _this.grid[i][j]; },
-        extraCheck: function extraCheck(position) { return position.row !== _this.square - 1 - position.col },
+        extraCheck(position) { return position.row !== _this.square - 1 - position.col },
         returnValue: Grid.enum().RHD_WIN
       }
     ];
@@ -73,7 +75,6 @@ class Grid {
       }
       return _this.winReduce(position, currentMark, currentObj);
     }, false);
-    console.log(win);
     if (win) {
       return { isGameWon: true, winType: win };
     }

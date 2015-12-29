@@ -38,9 +38,19 @@ app.controller('mainCtrl', function($scope, GameConst) {
       //maybe notify the user that marking failed
       return;
     }
+    console.log(success);
     if (success.isGameWon) {
       currentPlayer().addPoints(GameConst.WIN_POINT);
-      //display message thw current player win and ask for replay
+      //display message current player win and ask for replay
+      //save game points
+      return;
+    }
+    if (success.isGameOver) {
+      $scope.players.forEach(function(player) {
+        player.addPoints(GameConst.DRAW_POINT);
+      });
+      //display message draw and ask for replay
+      //save game points
       return;
     }
     changePlayer();
