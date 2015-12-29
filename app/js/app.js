@@ -28,6 +28,7 @@ app.controller('mainCtrl', function($scope, GameConst) {
     score: 'score'
   };
   $scope.isCurrentPlayer = isCurrentPlayer;
+  $scope.mark = mark;
 
   /*
   var playerTurn = player1;
@@ -40,7 +41,7 @@ app.controller('mainCtrl', function($scope, GameConst) {
   // */
 
   function mark(row, col) {
-   var success = grid.mark({row: row, col: col}, currentPlayer().marker);
+    var success = grid.mark({row: row, col: col}, currentPlayer().marker);
     if(!success) {
       //notify the user that marking failed
       return;
@@ -57,6 +58,4 @@ app.controller('mainCtrl', function($scope, GameConst) {
   function isCurrentPlayer(player) {
     return player.marker === currentPlayer().marker;
   }
-
-  console.log($scope.grid, $scope.players);
 });
