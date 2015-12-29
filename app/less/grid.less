@@ -2,16 +2,15 @@
 
 .grid {
   display: table;
-  width: 50%;
-  .row {
+  width: 60%;
+  min-width: 300px;
+  margin: 0 auto;
+
+  &__row {
     display: table-row;
-    &:first-child {
-      .col {
-        border-top: none;
-      }
-    }
   }
-  .col {
+
+  &__col {
     display: table-cell;
     border-top: @border;
     border-left: @border;
@@ -20,9 +19,13 @@
     &:first-child {
       border-left: none;
     }
+    .grid__row:first-child & {
+        border-top: none;
+    }
   }
-  .cell {
+
+  &__cell {
     display: inline-block;
-    min-height: 60px;
+    min-height: 100px;
   }
 }

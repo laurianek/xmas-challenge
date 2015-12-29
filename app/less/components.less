@@ -1,34 +1,47 @@
-.symbol-cross {
+.symbol {
   display: inline-block;
-  width: 15px;
-  height: 60px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, red, blue);
   position: relative;
-  transform: rotate(-45deg);
-  span {
-    display: block;
-    border-radius: 6px;
+  width: 100%;
+  &:before, &:after {
+    content: ' ';
     position: absolute;
-    width: 15px;
-    height: 60px;
-    background: linear-gradient(135deg, red, blue);
-    transform: rotate(90deg);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
   }
-}
 
-.symbol-nought {
-  display: inline-block;
-  width: 60px;
-  height: 60px;
-  border-radius: 100%;
-  background: linear-gradient(135deg, red, blue);
-  span {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    background: white;
-    border-radius: 100%;
-    margin-top: 15px;
+  &-cross {
+    &:before, &:after {
+      width: 15px;
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(135deg, red, blue);
+    }
+    &:before {
+      transform: rotate(-45deg);
+    }
+    &:after {
+      transform: rotate(45deg);
+    }
+  }
+
+  &-nought {
+    @disk: 80px;
+    @inner-disk: 40px;
+    &:before, &:after {
+      border-radius: 100%;
+      top: 50%;
+      transform: translate(0,-50%);
+    }
+    &:before {
+      width: @disk;
+      height: @disk;
+      background: linear-gradient(135deg, red, blue);
+    }
+    &:after {
+      width: @inner-disk;
+      height: @inner-disk;
+      background: white;
+    }
   }
 }

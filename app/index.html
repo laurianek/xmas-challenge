@@ -9,17 +9,43 @@
 
   <link type="text/css" href="../dist/css/main.css" rel="stylesheet">
 </head>
-<body ng-controller="mainCtrl">
+<body ng-controller="mainCtrl" class="container-fluid">
+<div class="row">
+  <div class="col-xs-12">
+    <div class="jumbotron">
+      <h1>Noughts and Crosses</h1>
+    </div>
 
-<div class="grid" ng-cloak>
-  <div class="row" ng-repeat="col in grid.grid">
-    <div class="col" ng-repeat="row in col track by $index">
-      <span class="cell" ng-class="row?row.class : ''">
+    <div class="grid" ng-cloak>
+      <div class="grid__row" ng-repeat="col in grid.grid">
+        <div class="grid__col" ng-repeat="row in col track by $index">
+      <span class="grid__cell symbol" ng-class="row?row.class : ''">
         <span></span>
       </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-6">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <i class="glyphicon glyphicon-user"></i> Player 1
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-6">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <i class="glyphicon glyphicon-user"></i> Player 2
+      </div>
     </div>
   </div>
 </div>
+
+
 
 
 <script src="../bower_components/angular/angular.js"></script>
