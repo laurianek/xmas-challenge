@@ -3,15 +3,15 @@
 .grid {
   display: table;
   width: 50%;
-  .col {
+  .row {
     display: table-row;
     &:first-child {
-      .row {
+      .col {
         border-top: none;
       }
     }
   }
-  .row {
+  .col {
     display: table-cell;
     border-top: @border;
     border-left: @border;
