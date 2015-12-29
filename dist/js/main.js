@@ -2,11 +2,40 @@
 
 var app = angular.module('tictactoe', []);
 
-app.controller('mainCtrl', function ($scope) {
-  $scope.grid = new Grid();
-  $scope.player1 = new Player('Player 1');
+app.constant('GameConst', {
+  NOUGHT: 'nought',
+  CROSS: 'cross',
+  NOUGHT_CLASS: 'symbol-nought',
+  CROSS_CLASS: 'symbol-cross'
+});
 
-  console.log($scope.grid, $scope.player1, 'hello');
+app.controller('mainCtrl', function ($scope, GameConst) {
+  $scope.grid = new Grid();
+  $scope.player1 = new Player('Player 1', {
+    symbol: GameConst.NOUGHT,
+    _class: GameConst.NOUGHT_CLASS
+  });
+  $scope.player2 = new Player('Player 2', {
+    symbol: GameConst.CROSS,
+    _class: GameConst.CROSS_CLASS
+  });
+
+  $scope.config = {
+    colour: 'colour',
+    symbol: 'marker'
+  };
+
+  /*
+  var playerTurn = player1;
+  grid onclick(function() {
+    mark grid;
+    check if won (only check for the last game move, be lazy)
+    if won then give score and end game;
+    else next player turn;
+  })
+  // */
+
+  console.log($scope.grid, $scope.player1);
 });
 'use strict';
 
@@ -16,18 +45,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Grid = (function () {
   function Grid() {
-    var row = arguments.length <= 0 || arguments[0] === undefined ? 3 : arguments[0];
-    var col = arguments.length <= 1 || arguments[1] === undefined ? 3 : arguments[1];
+    var _row = arguments.length <= 0 || arguments[0] === undefined ? 3 : arguments[0];
+
+    var _col = arguments.length <= 1 || arguments[1] === undefined ? 3 : arguments[1];
 
     _classCallCheck(this, Grid);
 
-    this.row = row;
-    this.col = col;
+    this.row = _row;
+    this.col = _col;
     this.grid = [];
-    for (var y = 0; y < this.col; y++) {
-      this.grid[y] = [];
-      for (var x = 0; x < this.row; x++) {
-        this.grid[y][x] = null;
+    for (var row = 0; row < this.col; row++) {
+      this.grid[row] = [];
+      for (var col = 0; col < this.row; col++) {
+        this.grid[row][col] = null;
       }
     }
   }
@@ -38,13 +68,13 @@ var Grid = (function () {
       if (!this.withinGridBounds(position)) {
         return false;
       }
-      this.grid[position.y][position.x] = marker;
+      this.grid[position.row][position.col] = marker;
       return true;
     }
   }, {
     key: 'withinGridBounds',
     value: function withinGridBounds(position) {
-      return position.x >= 0 && position.x < this.row && position.y >= 0 && position.y < this.col;
+      return position.row >= 0 && position.row < this.row && position.col >= 0 && position.col < this.col;
     }
   }, {
     key: 'draw',

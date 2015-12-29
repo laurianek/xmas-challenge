@@ -1,7 +1,14 @@
+@small-size: 30px;
 .symbol {
   display: inline-block;
   position: relative;
   width: 100%;
+  &.symbol--small {
+    width: @small-size;
+    height: @small-size;
+    vertical-align: middle;
+    margin-left: 5%;
+  }
   &:before, &:after {
     content: ' ';
     position: absolute;
@@ -23,11 +30,18 @@
     &:after {
       transform: rotate(45deg);
     }
+    &.symbol--small {
+      &:before, &:after {
+        width: 7px;
+      }
+    }
   }
 
   &-nought {
-    @disk: 80px;
-    @inner-disk: 40px;
+    @disk: 100%;
+    @inner-disk: 50%;
+    @max-disk: 80px;
+    @max-inner-disk: 40px;
     &:before, &:after {
       border-radius: 100%;
       top: 50%;
@@ -36,11 +50,15 @@
     &:before {
       width: @disk;
       height: @disk;
+      max-width: @max-disk;
+      max-height: @max-disk;
       background: linear-gradient(135deg, red, blue);
     }
     &:after {
       width: @inner-disk;
       height: @inner-disk;
+      max-width: @max-inner-disk;
+      max-height: @max-inner-disk;
       background: white;
     }
   }

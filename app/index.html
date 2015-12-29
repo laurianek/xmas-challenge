@@ -19,7 +19,7 @@
     <div class="grid" ng-cloak>
       <div class="grid__row" ng-repeat="col in grid.grid">
         <div class="grid__col" ng-repeat="row in col track by $index">
-      <span class="grid__cell symbol" ng-class="row?row.class : ''">
+      <span class="grid__cell symbol" ng-class="row?row._class : ''">
         <span></span>
       </span>
         </div>
@@ -32,14 +32,24 @@
   <div class="col-xs-6">
     <div class="panel panel-default">
       <div class="panel-body">
-        <i class="glyphicon glyphicon-user"></i> Player 1
+        <p>
+          <i class="glyphicon glyphicon-user"></i>
+          {{ player1.name }}
+        </p>
+        <p>{{ config.symbol }}: <span class="symbol symbol--small" ng-class="player1.marker._class"></span></p>
+        <p>{{ config.colour }}: </p>
       </div>
     </div>
   </div>
   <div class="col-xs-6">
     <div class="panel panel-default">
       <div class="panel-body">
-        <i class="glyphicon glyphicon-user"></i> Player 2
+        <p>
+          <i class="glyphicon glyphicon-user"></i>
+          {{ player2.name }}
+        </p>
+        <p>{{ config.symbol }}: <span class="symbol symbol--small" ng-class="player2.marker._class"></span></p>
+        <p>{{ config.colour }}: </p>
       </div>
     </div>
   </div>
