@@ -23,8 +23,12 @@ class Grid {
     this.grid[position.row][position.col] = marker;
     this.freeCell--;
     var game = this.gameWon(position);
+    if (game.isGameOver) {
+      this.gameOver = game.isGameOver;
+      return game;
+    }
     game.isGameOver = 0 === this.freeCell;
-    this.gameOver = game.isGameWon || game.isGameOver;
+    this.gameOver = game.isGameOver;
     return game;
   }
   withinGridBounds(position) {
@@ -76,9 +80,9 @@ class Grid {
       return _this.winReduce(position, currentMark, currentObj);
     }, false);
     if (win) {
-      return { isGameWon: true, winType: win };
+      return { isGameWon: true, winType: win, isGameOver: true };
     }
-    return { isGameWon: false, winType: '' };
+    return { isGameWon: false, winType: '', isGameOver: false };
   }
 
   static enum() {

@@ -12,7 +12,6 @@ app.constant('GameConst', {
 });
 
 app.controller('mainCtrl', function ($scope, GameConst) {
-  var grid = new Grid();
   var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
@@ -22,7 +21,6 @@ app.controller('mainCtrl', function ($scope, GameConst) {
     _class: GameConst.CROSS_CLASS
   });
   var isPlayer1Turn = true;
-  $scope.grid = grid;
   $scope.players = [player1, player2];
   $scope.config = {
     colour: 'colour',
@@ -31,25 +29,27 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   };
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = mark;
+  $scope.replay = init;
+  init();
 
   function mark(row, col) {
-    var success = grid.mark({ row: row, col: col }, currentPlayer().marker);
+    var success = $scope.grid.mark({ row: row, col: col }, currentPlayer().marker);
     if (!success) {
       //maybe notify the user that marking failed
       return;
     }
     console.log(success);
-    if (success.isGameWon) {
-      currentPlayer().addPoints(GameConst.WIN_POINT);
-      //display message current player win and ask for replay
-      //save game points
-      return;
-    }
     if (success.isGameOver) {
-      $scope.players.forEach(function (player) {
-        player.addPoints(GameConst.DRAW_POINT);
-      });
-      //display message draw and ask for replay
+      $scope.isGameOver = true;
+      if (success.isGameWon) {
+        currentPlayer().addPoints(GameConst.WIN_POINT);
+        $scope.msg = currentPlayer().name + ' won this round!';
+      } else {
+        $scope.players.forEach(function (player) {
+          player.addPoints(GameConst.DRAW_POINT);
+        });
+        $scope.msg = 'Draw!';
+      }
       //save game points
       return;
     }
@@ -63,6 +63,10 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   }
   function isCurrentPlayer(player) {
     return player.marker === currentPlayer().marker;
+  }
+  function init() {
+    $scope.grid = new Grid();
+    $scope.isGameOver = false;
   }
 });
 'use strict';
@@ -101,8 +105,12 @@ var Grid = (function () {
       this.grid[position.row][position.col] = marker;
       this.freeCell--;
       var game = this.gameWon(position);
+      if (game.isGameOver) {
+        this.gameOver = game.isGameOver;
+        return game;
+      }
       game.isGameOver = 0 === this.freeCell;
-      this.gameOver = game.isGameWon || game.isGameOver;
+      this.gameOver = game.isGameOver;
       return game;
     }
   }, {
@@ -170,9 +178,9 @@ var Grid = (function () {
         return _this.winReduce(position, currentMark, currentObj);
       }, false);
       if (win) {
-        return { isGameWon: true, winType: win };
+        return { isGameWon: true, winType: win, isGameOver: true };
       }
-      return { isGameWon: false, winType: '' };
+      return { isGameWon: false, winType: '', isGameOver: false };
     }
   }], [{
     key: 'enum',
