@@ -11,18 +11,20 @@ app.constant('GameConst', {
 
 app.controller('mainCtrl', function($scope, GameConst) {
   $scope.grid = new Grid();
-  $scope.player1 = new Player('Player 1', {
+  var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
   });
-  $scope.player2 = new Player('Player 2', {
+  var player2 = new Player('Player 2', {
     symbol: GameConst.CROSS,
     _class: GameConst.CROSS_CLASS
   });
+  $scope.players = [player1, player2];
 
   $scope.config = {
     colour: 'colour',
-    symbol: 'marker'
+    symbol: 'marker',
+    score: 'score'
   };
 
   /*
