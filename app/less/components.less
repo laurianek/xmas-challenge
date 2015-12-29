@@ -3,6 +3,7 @@
   display: inline-block;
   position: relative;
   width: 100%;
+
   &.symbol--small {
     width: @small-size;
     height: @small-size;
@@ -22,7 +23,7 @@
       width: 15px;
       height: 100%;
       border-radius: 6px;
-      background: linear-gradient(135deg, red, blue);
+      .red();
     }
     &:before {
       transform: rotate(-45deg);
@@ -52,7 +53,7 @@
       height: @disk;
       max-width: @max-disk;
       max-height: @max-disk;
-      background: linear-gradient(135deg, red, blue);
+      .red();
     }
     &:after {
       width: @inner-disk;
@@ -61,5 +62,21 @@
       max-height: @max-inner-disk;
       background: white;
     }
+  }
+
+  &-red {
+    .red();
+  }
+  &-blue {
+    .blue();
+  }
+  &-yellow {
+    .yellow();
+  }
+  &-pink {
+    .pink();
+  }
+  &-green {
+    .green();
   }
 }
