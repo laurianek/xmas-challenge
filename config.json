@@ -8,7 +8,9 @@
       "app/js/lib/arrayReducePolyfill.js",
       "app/js/grid.js",
       "app/js/player.js",
-      "app/js/app.js"
+      "app/js/app.js",
+      "app/js/gameconst.js",
+      "app/js/mainctrl.js"
     ],
     "css": "app/less/*.less"
   }

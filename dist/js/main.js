@@ -303,6 +303,7 @@ var Player = (function () {
 'use strict';
 
 var app = angular.module('tictactoe', []);
+'use strict';
 
 app.constant('GameConst', {
   NOUGHT: 'nought',
@@ -314,6 +315,7 @@ app.constant('GameConst', {
   SINGLE_PLAYER: 'single-player',
   MULTI_PLAYER: 'multy-player'
 });
+'use strict';
 
 app.controller('mainCtrl', function ($scope, $q, GameConst) {
   var player1 = new Player('Player 1', {
