@@ -8,20 +8,15 @@ app.factory('GamePlayService', function (GameConst, $q) {
   var isPlayer1Turn;
   var player1Start;
   var gameOutcomeMsg = '';
+  var previousSolo;
 
-  var player1 = new Player('Player 1', {
-    symbol: GameConst.NOUGHT,
-    _class: GameConst.NOUGHT_CLASS
-  });
-
-  var player2 = new Player('Player 2 (bot)', {
-    symbol: GameConst.CROSS,
-    _class: GameConst.CROSS_CLASS
-  }, true);
+  var player1 = getNewPlayer('Player 1', false);
+  var player2 = getNewPlayer('Player 2 (bot)', true, true);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
-    sessionPlayer: player1
+    sessionPlayer: player1,
+    players: [player1, player2]
   };
 
   // Service functions
@@ -92,6 +87,37 @@ app.factory('GamePlayService', function (GameConst, $q) {
   function getGameOutcomeMsg() {
     return gameOutcomeMsg;
   }
+  function switchPlayMode() {
+    if (gameMode.mode === GameConst.SINGLE_PLAYER) {
+      previousSolo = gameMode;
+      player1 = getNewPlayer('Player 1', false);
+      player2 = getNewPlayer('Player 2', true);
+      newGame();
+      gameMode = {
+        mode: GameConst.MULTI_PLAYER
+      };
+      return GameConst.MULTI_PLAYER;
+    }
+    if (gameMode.mode === GameConst.MULTI_PLAYER) {
+      gameMode = previousSolo;
+      player1 = gameMode.players[0];
+      player2 = gameMode.players[1];
+      newGame();
+      return GameConst.SINGLE_PLAYER;
+    }
+  }
+  function getNewPlayer(name, isCross, isBot) {
+    if (isCross) {
+      return new Player(name, {
+        symbol: GameConst.CROSS,
+        _class: GameConst.CROSS_CLASS
+      }, isBot);
+    }
+    return new Player(name, {
+      symbol: GameConst.NOUGHT,
+      _class: GameConst.NOUGHT_CLASS
+    }, isBot);
+  }
 
   // returned API
   return {
@@ -101,6 +127,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
     isCurrentPlayer: isCurrentPlayer,
     newGame: newGame,
     isGameOver: isGameOver,
-    markHandler: markHandler
+    markHandler: markHandler,
+    switchPlayMode: switchPlayMode
   };
 });

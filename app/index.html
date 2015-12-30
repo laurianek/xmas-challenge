@@ -32,7 +32,12 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-sm-6 player-info" ng-repeat="player in players">
+  <div class="col-xs-12">
+    <button class="btn btn-success pull-right btn-switch" ng-click="switchPlayMode()">{{ switchText }}</button>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-6 player-info" ng-repeat="player in players" ng-cloak>
     <div class="panel panel-default"
          ng-class="{'panel-default': !isCurrentPlayer(player), 'panel-success': isCurrentPlayer(player)}">
       <div class="panel-heading">
@@ -42,7 +47,7 @@
         </span>
         <form ng-submit="player.editName = false" ng-show="player.editName">
           <label class="sr-only" for="player{{ $index }}">enter your name</label>
-          <input type="text" class="player-name" id="player{{ $index }}" ng-model="player.name" >
+          <input type="text" class="player-name" id="player{{ $index }}" ng-model="player.name">
         </form>
         <span class="badge pull-right" ng-show="isCurrentPlayer(player)">&nbsp;</span>
       </div>

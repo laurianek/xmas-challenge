@@ -7,11 +7,20 @@ app.controller('mainCtrl', function($scope, $q, GameConst, GamePlayService, Colo
   $scope.colours = Player.colourArray;
   $scope.getSymbolColour = function(obj) { return ColourService.getSymbolColour(obj, GamePlayService.getPlayers());};
   $scope.mark = GamePlayService.markHandler;
+  $scope.switchText = 'switch to multiplayer';
   $scope.replay = init;
+  $scope.switchPlayMode = switchPlayMode;
   init();
 
   function init() {
     GamePlayService.newGame();
+    $scope.grid = GamePlayService.getGrid();
+    $scope.isGameOver = GamePlayService.isGameOver();
+  }
+  function switchPlayMode() {
+    var playMode = GamePlayService.switchPlayMode();
+    $scope.switchText = playMode === GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
+    $scope.players = GamePlayService.getPlayers();
     $scope.grid = GamePlayService.getGrid();
     $scope.isGameOver = GamePlayService.isGameOver();
   }
