@@ -1,98 +1,100 @@
 'use strict';
 
-var app = angular.module('tictactoe', []);
+// Production steps of ECMA-262, Edition 5, 15.4.4.18
+// Reference: http://es5.github.io/#x15.4.4.18
+if (!Array.prototype.forEach) {
 
-app.constant('GameConst', {
-  NOUGHT: 'nought',
-  CROSS: 'cross',
-  NOUGHT_CLASS: 'symbol-nought',
-  CROSS_CLASS: 'symbol-cross',
-  WIN_POINT: 1,
-  DRAW_POINT: 0.5,
-  SINGLE_PLAYER: 'single-player',
-  MULTI_PLAYER: 'multy-player'
-});
+  Array.prototype.forEach = function (callback, thisArg) {
 
-app.controller('mainCtrl', function ($scope, $q, GameConst) {
-  var player1 = new Player('Player 1', {
-    symbol: GameConst.NOUGHT,
-    _class: GameConst.NOUGHT_CLASS
-  });
-  var player2 = new Player('Player 2 (bot)', {
-    symbol: GameConst.CROSS,
-    _class: GameConst.CROSS_CLASS
-  }, true);
-  var isPlayer1Turn = true;
-  $scope.players = [player1, player2];
-  $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
-  $scope.colours = Player.colourArray();
-  $scope.isCurrentPlayer = isCurrentPlayer;
-  $scope.mark = function (row, col) {
-    currentPlayer().mark(row, col);
-  };
-  $scope.replay = init;
-  $scope.getSymbolColour = getSymbolColour;
-  init();
+    var T, k;
 
-  function mark(position) {
-    var success = $scope.grid.mark(position, currentPlayer().marker);
-    if (!success) {
-      getUserMove();
-      return;
+    if (this == null) {
+      throw new TypeError(' this is null or not defined');
     }
-    if (success.isGameOver) {
-      $scope.isGameOver = true;
-      if (success.isGameWon) {
-        currentPlayer().addPoints(GameConst.WIN_POINT);
-        $scope.msg = currentPlayer().name + ' won this round!';
-      } else {
-        $scope.players.forEach(function (player) {
-          player.addPoints(GameConst.DRAW_POINT);
-        });
-        $scope.msg = 'Draw!';
+
+    // 1. Let O be the result of calling ToObject passing the |this| value as the argument.
+    var O = Object(this);
+
+    // 2. Let lenValue be the result of calling the Get internal method of O with the argument "length".
+    // 3. Let len be ToUint32(lenValue).
+    var len = O.length >>> 0;
+
+    // 4. If IsCallable(callback) is false, throw a TypeError exception.
+    // See: http://es5.github.com/#x9.11
+    if (typeof callback !== "function") {
+      throw new TypeError(callback + ' is not a function');
+    }
+
+    // 5. If thisArg was supplied, let T be thisArg; else let T be undefined.
+    if (arguments.length > 1) {
+      T = thisArg;
+    }
+
+    // 6. Let k be 0
+    k = 0;
+
+    // 7. Repeat, while k < len
+    while (k < len) {
+
+      var kValue;
+
+      // a. Let Pk be ToString(k).
+      //   This is implicit for LHS operands of the in operator
+      // b. Let kPresent be the result of calling the HasProperty internal method of O with argument Pk.
+      //   This step can be combined with c
+      // c. If kPresent is true, then
+      if (k in O) {
+
+        // i. Let kValue be the result of calling the Get internal method of O with argument Pk.
+        kValue = O[k];
+
+        // ii. Call the Call internal method of callback with T as the this value and
+        // argument list containing kValue, k, and O.
+        callback.call(T, kValue, k, O);
       }
-      //save game points
-      return;
+      // d. Increase k by 1.
+      k++;
     }
-    changePlayer();
-    getUserMove();
-  }
-  function currentPlayer() {
-    return isPlayer1Turn ? player1 : player2;
-  }
-  function changePlayer() {
-    return isPlayer1Turn = !isPlayer1Turn;
-  }
-  function getUserMove() {
-    console.log('get user move', currentPlayer());
-    var deffered = $q.defer();
-    var promise = currentPlayer().play(deffered);
-    promise.then(function success(value) {
-      console.log('got user move');
-      mark(value);
-    }, function failure(reason) {}, function notify() {});
-  }
-  function isCurrentPlayer(player) {
-    return player.marker === currentPlayer().marker;
-  }
-  function init() {
-    $scope.grid = new Grid();
-    $scope.isGameOver = false;
-    $scope.gameMode = GameConst.SINGLE_PLAYER;
-    getUserMove();
-  }
-  function getSymbolColour(obj) {
-    if (obj.player) {
-      return 'symbol-' + obj.player.colour;
+    // 8. return undefined
+  };
+}
+'use strict';
+
+// Production steps of ECMA-262, Edition 5, 15.4.4.21
+// Reference: http://es5.github.io/#x15.4.4.21
+if (!Array.prototype.reduce) {
+  Array.prototype.reduce = function (callback /*, initialValue*/) {
+    'use strict';
+
+    if (this == null) {
+      throw new TypeError('Array.prototype.reduce called on null or undefined');
     }
-    if (obj.marker) {
-      var player = player1.marker.symbol == obj.marker.symbol ? player1 : player2;
-      console.log('symbol-' + player.colour);
-      return 'symbol-' + player.colour;
+    if (typeof callback !== 'function') {
+      throw new TypeError(callback + ' is not a function');
     }
-    return '';
-  }
-});
+    var t = Object(this),
+        len = t.length >>> 0,
+        k = 0,
+        value;
+    if (arguments.length == 2) {
+      value = arguments[1];
+    } else {
+      while (k < len && !(k in t)) {
+        k++;
+      }
+      if (k >= len) {
+        throw new TypeError('Reduce of empty array with no initial value');
+      }
+      value = t[k++];
+    }
+    for (; k < len; k++) {
+      if (k in t) {
+        value = callback(value, t[k], k, t);
+      }
+    }
+    return value;
+  };
+}
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -300,99 +302,97 @@ var Player = (function () {
 })();
 'use strict';
 
-// Production steps of ECMA-262, Edition 5, 15.4.4.18
-// Reference: http://es5.github.io/#x15.4.4.18
-if (!Array.prototype.forEach) {
+var app = angular.module('tictactoe', []);
 
-  Array.prototype.forEach = function (callback, thisArg) {
+app.constant('GameConst', {
+  NOUGHT: 'nought',
+  CROSS: 'cross',
+  NOUGHT_CLASS: 'symbol-nought',
+  CROSS_CLASS: 'symbol-cross',
+  WIN_POINT: 1,
+  DRAW_POINT: 0.5,
+  SINGLE_PLAYER: 'single-player',
+  MULTI_PLAYER: 'multy-player'
+});
 
-    var T, k;
-
-    if (this == null) {
-      throw new TypeError(' this is null or not defined');
-    }
-
-    // 1. Let O be the result of calling ToObject passing the |this| value as the argument.
-    var O = Object(this);
-
-    // 2. Let lenValue be the result of calling the Get internal method of O with the argument "length".
-    // 3. Let len be ToUint32(lenValue).
-    var len = O.length >>> 0;
-
-    // 4. If IsCallable(callback) is false, throw a TypeError exception.
-    // See: http://es5.github.com/#x9.11
-    if (typeof callback !== "function") {
-      throw new TypeError(callback + ' is not a function');
-    }
-
-    // 5. If thisArg was supplied, let T be thisArg; else let T be undefined.
-    if (arguments.length > 1) {
-      T = thisArg;
-    }
-
-    // 6. Let k be 0
-    k = 0;
-
-    // 7. Repeat, while k < len
-    while (k < len) {
-
-      var kValue;
-
-      // a. Let Pk be ToString(k).
-      //   This is implicit for LHS operands of the in operator
-      // b. Let kPresent be the result of calling the HasProperty internal method of O with argument Pk.
-      //   This step can be combined with c
-      // c. If kPresent is true, then
-      if (k in O) {
-
-        // i. Let kValue be the result of calling the Get internal method of O with argument Pk.
-        kValue = O[k];
-
-        // ii. Call the Call internal method of callback with T as the this value and
-        // argument list containing kValue, k, and O.
-        callback.call(T, kValue, k, O);
-      }
-      // d. Increase k by 1.
-      k++;
-    }
-    // 8. return undefined
+app.controller('mainCtrl', function ($scope, $q, GameConst) {
+  var player1 = new Player('Player 1', {
+    symbol: GameConst.NOUGHT,
+    _class: GameConst.NOUGHT_CLASS
+  });
+  var player2 = new Player('Player 2 (bot)', {
+    symbol: GameConst.CROSS,
+    _class: GameConst.CROSS_CLASS
+  }, true);
+  var isPlayer1Turn = true;
+  $scope.players = [player1, player2];
+  $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
+  $scope.colours = Player.colourArray();
+  $scope.isCurrentPlayer = isCurrentPlayer;
+  $scope.mark = function (row, col) {
+    currentPlayer().mark(row, col);
   };
-}
-'use strict';
+  $scope.replay = init;
+  $scope.getSymbolColour = getSymbolColour;
+  init();
 
-// Production steps of ECMA-262, Edition 5, 15.4.4.21
-// Reference: http://es5.github.io/#x15.4.4.21
-if (!Array.prototype.reduce) {
-  Array.prototype.reduce = function (callback /*, initialValue*/) {
-    'use strict';
-
-    if (this == null) {
-      throw new TypeError('Array.prototype.reduce called on null or undefined');
+  function mark(position) {
+    var success = $scope.grid.mark(position, currentPlayer().marker);
+    if (!success) {
+      getUserMove();
+      return;
     }
-    if (typeof callback !== 'function') {
-      throw new TypeError(callback + ' is not a function');
-    }
-    var t = Object(this),
-        len = t.length >>> 0,
-        k = 0,
-        value;
-    if (arguments.length == 2) {
-      value = arguments[1];
-    } else {
-      while (k < len && !(k in t)) {
-        k++;
+    if (success.isGameOver) {
+      $scope.isGameOver = true;
+      if (success.isGameWon) {
+        currentPlayer().addPoints(GameConst.WIN_POINT);
+        $scope.msg = currentPlayer().name + ' won this round!';
+      } else {
+        $scope.players.forEach(function (player) {
+          player.addPoints(GameConst.DRAW_POINT);
+        });
+        $scope.msg = 'Draw!';
       }
-      if (k >= len) {
-        throw new TypeError('Reduce of empty array with no initial value');
-      }
-      value = t[k++];
+      //save game points
+      return;
     }
-    for (; k < len; k++) {
-      if (k in t) {
-        value = callback(value, t[k], k, t);
-      }
+    changePlayer();
+    getUserMove();
+  }
+  function currentPlayer() {
+    return isPlayer1Turn ? player1 : player2;
+  }
+  function changePlayer() {
+    return isPlayer1Turn = !isPlayer1Turn;
+  }
+  function getUserMove() {
+    console.log('get user move', currentPlayer());
+    var deffered = $q.defer();
+    var promise = currentPlayer().play(deffered);
+    promise.then(function success(value) {
+      console.log('got user move');
+      mark(value);
+    }, function failure(reason) {}, function notify() {});
+  }
+  function isCurrentPlayer(player) {
+    return player.marker === currentPlayer().marker;
+  }
+  function init() {
+    $scope.grid = new Grid();
+    $scope.isGameOver = false;
+    $scope.gameMode = GameConst.SINGLE_PLAYER;
+    getUserMove();
+  }
+  function getSymbolColour(obj) {
+    if (obj.player) {
+      return 'symbol-' + obj.player.colour;
     }
-    return value;
-  };
-}
+    if (obj.marker) {
+      var player = player1.marker.symbol == obj.marker.symbol ? player1 : player2;
+      console.log('symbol-' + player.colour);
+      return 'symbol-' + player.colour;
+    }
+    return '';
+  }
+});
 //# sourceMappingURL=main.js.map

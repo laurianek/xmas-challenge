@@ -38,6 +38,16 @@ gulp.task('font', function() {
     .pipe(gulp.dest('dist/fonts'));
 });
 
+gulp.task('html', function() {
+  return gulp.src('app/*.html')
+    .pipe(plugins.htmlmin({
+      collapseWhitespace: true,
+      conservativeCollapse: true,
+      useShortDoctype: true
+    }))
+    .pipe(gulp.dest('dist'))
+});
+
 gulp.task('watch', function () {
   var jsWatcher = gulp.watch(config.paths.js, ['js']);
   var cssWatcher = gulp.watch(config.paths.css, ['css']);
@@ -48,4 +58,6 @@ gulp.task('watch', function () {
     console.log('Event path: ' + event.path); // The path of the modified file
   }
 });
+
+gulp.task('dist', ['html','js','css','font']);
 
