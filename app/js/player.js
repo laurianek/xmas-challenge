@@ -20,7 +20,6 @@ class Player {
   static randomCell(){
     var a = Math.floor(Math.random() * 100);
     var boundary = Math.floor(100 / 3);
-    console.log('a', a, 'boundary', boundary);
     if (0 <= a && a < boundary) {
       return 0;
     }

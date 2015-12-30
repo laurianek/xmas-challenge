@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('mainCtrl', function($scope, $q, GameConst) {
+app.controller('mainCtrl', function($scope, $q, GameConst, ColourService) {
   var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
@@ -14,7 +14,9 @@ app.controller('mainCtrl', function($scope, $q, GameConst) {
   $scope.players = [player1, player2];
   $scope.config = {colour: 'colour', symbol: 'marker', score: 'score'};
   $scope.isCurrentPlayer = isCurrentPlayer;
+  $scope.colours = Player.colourArray;
   $scope.mark = function(row, col){ currentPlayer().mark(row, col); };
+  $scope.getSymbolColour = function(obj) { return ColourService.getSymbolColour(obj, $scope.players);};
   $scope.replay = init;
   init();
 
@@ -64,20 +66,5 @@ app.controller('mainCtrl', function($scope, $q, GameConst) {
     $scope.isGameOver = false;
     $scope.gameMode = GameConst.SINGLE_PLAYER;
     getUserMove();
-  }
-
-  // *** colours
-  $scope.getSymbolColour = getSymbolColour;
-  $scope.colours = Player.colourArray;
-  function getSymbolColour(obj) {
-    if(obj.player) {
-      return `symbol-${obj.player.colour}`;
-    }
-    if(obj.marker) {
-      let player = player1.marker.symbol == obj.marker.symbol ? player1 : player2;
-      console.log(`symbol-${player.colour}`);
-      return `symbol-${player.colour}`;
-    }
-    return '';
   }
 });

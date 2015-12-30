@@ -56,9 +56,9 @@ gulp.task('config:reload', function(){
 });
 
 gulp.task('watch', function () {
+  gulp.watch(config.paths.buildConfig, ['config:reload']);
   var jsWatcher = gulp.watch(config.paths.js, ['js']);
   var cssWatcher = gulp.watch(config.paths.css, ['css']);
-  gulp.watch(config.paths.buildConfig, ['config:reload']);
   jsWatcher.on('change', watchLog);
   cssWatcher.on('change', watchLog);
   function watchLog(event) {

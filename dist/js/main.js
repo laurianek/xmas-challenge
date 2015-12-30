@@ -279,7 +279,6 @@ var Player = (function () {
     value: function randomCell() {
       var a = Math.floor(Math.random() * 100);
       var boundary = Math.floor(100 / 3);
-      console.log('a', a, 'boundary', boundary);
       if (0 <= a && a < boundary) {
         return 0;
       }
@@ -311,7 +310,36 @@ app.constant('GameConst', {
 });
 'use strict';
 
-app.controller('mainCtrl', function ($scope, $q, GameConst) {
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ColourService = (function () {
+  function ColourService() {
+    _classCallCheck(this, ColourService);
+  }
+
+  _createClass(ColourService, [{
+    key: 'getSymbolColour',
+    value: function getSymbolColour(obj, players) {
+      if (obj.player) {
+        return 'symbol-' + obj.player.colour;
+      }
+      if (obj.marker) {
+        var player = players[0].marker.symbol == obj.marker.symbol ? players[0] : players[1];
+        return 'symbol-' + player.colour;
+      }
+      return '';
+    }
+  }]);
+
+  return ColourService;
+})();
+
+app.service('ColourService', ColourService);
+'use strict';
+
+app.controller('mainCtrl', function ($scope, $q, GameConst, ColourService) {
   var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
@@ -325,8 +353,12 @@ app.controller('mainCtrl', function ($scope, $q, GameConst) {
   $scope.players = [player1, player2];
   $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
   $scope.isCurrentPlayer = isCurrentPlayer;
+  $scope.colours = Player.colourArray;
   $scope.mark = function (row, col) {
     currentPlayer().mark(row, col);
+  };
+  $scope.getSymbolColour = function (obj) {
+    return ColourService.getSymbolColour(obj, $scope.players);
   };
   $scope.replay = init;
   init();
@@ -377,21 +409,6 @@ app.controller('mainCtrl', function ($scope, $q, GameConst) {
     $scope.isGameOver = false;
     $scope.gameMode = GameConst.SINGLE_PLAYER;
     getUserMove();
-  }
-
-  // *** colours
-  $scope.getSymbolColour = getSymbolColour;
-  $scope.colours = Player.colourArray;
-  function getSymbolColour(obj) {
-    if (obj.player) {
-      return 'symbol-' + obj.player.colour;
-    }
-    if (obj.marker) {
-      var player = player1.marker.symbol == obj.marker.symbol ? player1 : player2;
-      console.log('symbol-' + player.colour);
-      return 'symbol-' + player.colour;
-    }
-    return '';
   }
 });
 //# sourceMappingURL=main.js.map
