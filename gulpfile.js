@@ -44,7 +44,8 @@ gulp.task('html', function() {
       collapseWhitespace: true,
       conservativeCollapse: true,
       useShortDoctype: true,
-      minifyURLs: {}
+      minifyURLs: {},
+      minifyJS: true
     }))
     .pipe(gulp.dest('dist'))
 });
