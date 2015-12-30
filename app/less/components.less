@@ -65,6 +65,55 @@
   }
 
   &-red {
+    &.symbol-nought:before,
+    &.symbol-cross:before,
+    &.symbol-cross:after {
+      .red();
+    }
+  }
+  &-blue {
+    &.symbol-nought:before,
+    &.symbol-cross:before,
+    &.symbol-cross:after {
+      .blue();
+    }
+  }
+  &-yellow {
+    &.symbol-nought:before,
+    &.symbol-cross:before,
+    &.symbol-cross:after {
+      .yellow();
+    }
+  }
+  &-pink {
+    &.symbol-nought:before,
+    &.symbol-cross:before,
+    &.symbol-cross:after {
+      .pink();
+    }
+  }
+  &-green {
+    &.symbol-nought:before,
+    &.symbol-cross:before,
+    &.symbol-cross:after {
+      .green();
+    }
+  }
+}
+
+.colour-pick {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 3px;
+  border-radius: 2px;
+  transition: border-radius .2s;
+
+  &-active {
+    border-radius: 10px;
+  }
+
+  &-red {
     .red();
   }
   &-blue {

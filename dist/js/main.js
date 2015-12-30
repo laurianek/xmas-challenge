@@ -27,6 +27,7 @@ app.controller('mainCtrl', function ($scope, GameConst) {
     symbol: 'marker',
     score: 'score'
   };
+  $scope.colours = Player.colourArray();
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = mark;
   $scope.replay = init;
@@ -211,6 +212,7 @@ var Player = (function () {
     this.name = name;
     this.marker = marker;
     this.score = score;
+    this.colour = null;
   }
 
   _createClass(Player, [{
@@ -220,6 +222,11 @@ var Player = (function () {
       if (point) {
         this.score += point;
       }
+    }
+  }], [{
+    key: 'colourArray',
+    value: function colourArray() {
+      return ['red', 'yellow', 'green', 'blue', 'pink'];
     }
   }]);
 

@@ -5,12 +5,23 @@ class Player {
     this.name = name;
     this.marker = marker;
     this.score = score;
+    this.colour = null;
   }
 
   addPoints(_point) {
     var point = Number(_point);
     if(point) {
-      this.score += point
+      this.score += point;
     }
+  }
+
+  static colourArray() {
+    return [
+    'red',
+    'yellow',
+    'green',
+    'blue',
+    'pink'
+    ];
   }
 }

@@ -27,6 +27,7 @@ app.controller('mainCtrl', function($scope, GameConst) {
     symbol: 'marker',
     score: 'score'
   };
+  $scope.colours = Player.colourArray();
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = mark;
   $scope.replay = init;

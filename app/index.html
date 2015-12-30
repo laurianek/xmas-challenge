@@ -43,9 +43,18 @@
         <span class="badge pull-right" ng-show="isCurrentPlayer(player)">&nbsp;</span>
       </div>
       <div class="panel-body">
-        <p>{{ config.symbol }}: <span class="symbol symbol--small" ng-class="player.marker._class"></span></p>
-        <p>{{ config.score }}: {{ player.score }}</p>
-        <p>{{ config.colour }}: </p>
+        <p>{{ config.symbol }}:
+          <span class="symbol symbol--small"
+                ng-class="[player.marker._class, (player.colour ? 'symbol-' + player.colour : '')]"></span>
+        </p>
+        <p>{{ config.score }}: <span>{{ player.score }} pts</span></p>
+        <p>{{ config.colour }}:
+          <button class="colour-pick colour-pick-{{colour}} text-hide"
+                  ng-repeat="colour in colours" ng-click="player.colour = colour"
+                  ng-class="{'colour-pick-active': player.colour == colour}">
+            {{ colour }}
+          </button>
+        </p>
       </div>
     </div>
   </div>
