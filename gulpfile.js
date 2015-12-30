@@ -8,15 +8,12 @@ const LessPluginAutoPrefix = require('less-plugin-autoprefix');
 const cleancss = new LessPluginCleanCSS({ advanced: true });
 const autoprefix= new LessPluginAutoPrefix({ browsers: ["last 4 versions"] });
 
-var paths = {
-  js: 'app/js/**/*.js',
-  css: 'app/less/*.less'
-};
+const config = require('./config.json');
 
 gulp.task('default', plugins.taskListing);
 
 gulp.task('js', function() {
-  return gulp.src(paths.js)
+  return gulp.src(config.paths.orderedJs)
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.babel({
       presets: ['es2015']
@@ -37,8 +34,8 @@ gulp.task('css', function() {
 });
 
 gulp.task('watch', function () {
-  var jsWatcher = gulp.watch(paths.js, ['js']);
-  var cssWatcher = gulp.watch(paths.css, ['css']);
+  var jsWatcher = gulp.watch(config.paths.js, ['js']);
+  var cssWatcher = gulp.watch(config.paths.css, ['css']);
   jsWatcher.on('change', watchLog);
   cssWatcher.on('change', watchLog);
   function watchLog(event) {

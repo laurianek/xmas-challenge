@@ -29,6 +29,7 @@
     "gulp-load-plugins": "^1.1.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-task-listing": "^1.0.1",
+    "gulp-uglify": "^1.5.1",
     "less-plugin-autoprefix": "^1.5.1",
     "less-plugin-clean-css": "^1.5.1"
   }

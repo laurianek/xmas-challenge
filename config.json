@@ -1,0 +1,15 @@
+{
+  "paths": {
+    "js": [
+      "app/js/**/*.js"
+    ],
+    "orderedJs": [
+      "app/js/lib/arrayForEachPolyfill.js",
+      "app/js/lib/arrayReducePolyfill.js",
+      "app/js/grid.js",
+      "app/js/player.js",
+      "app/js/app.js"
+    ],
+    "css": "app/less/*.less"
+  }
+}

@@ -45,18 +45,14 @@ class Player {
     this.canPlay = deffered;
     if(this.isBot) {
       setTimeout(function botMove() {
-        var position = {row: Player.randomCell(), col: Player.randomCell()};
-        console.log(position);
-        _this.canPlay.resolve(position);
-        _this.canPlay = false;
-      }, 500)
+        _this.mark(Player.randomCell(), Player.randomCell())
+      }, 200)
     }
     return this.canPlay.promise;
   }
 
   mark(row, col) {
     if (this.canPlay) {
-      console.log(this);
       this.canPlay.resolve({row: row, col: col});
       this.canPlay = false;
     }

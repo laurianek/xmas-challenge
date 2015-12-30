@@ -8,7 +8,9 @@ app.constant('GameConst', {
   NOUGHT_CLASS: 'symbol-nought',
   CROSS_CLASS: 'symbol-cross',
   WIN_POINT: 1,
-  DRAW_POINT: 0.5
+  DRAW_POINT: 0.5,
+  SINGLE_PLAYER: 'single-player',
+  MULTI_PLAYER: 'multy-player'
 });
 
 app.controller('mainCtrl', function ($scope, $q, GameConst) {
@@ -16,17 +18,13 @@ app.controller('mainCtrl', function ($scope, $q, GameConst) {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
   });
-  var player2 = new Player('Player 2', {
+  var player2 = new Player('Player 2 (bot)', {
     symbol: GameConst.CROSS,
     _class: GameConst.CROSS_CLASS
   }, true);
   var isPlayer1Turn = true;
   $scope.players = [player1, player2];
-  $scope.config = {
-    colour: 'colour',
-    symbol: 'marker',
-    score: 'score'
-  };
+  $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
   $scope.colours = Player.colourArray();
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = function (row, col) {
@@ -80,10 +78,10 @@ app.controller('mainCtrl', function ($scope, $q, GameConst) {
   function init() {
     $scope.grid = new Grid();
     $scope.isGameOver = false;
+    $scope.gameMode = GameConst.SINGLE_PLAYER;
     getUserMove();
   }
   function getSymbolColour(obj) {
-
     if (obj.player) {
       return 'symbol-' + obj.player.colour;
     }
@@ -259,11 +257,8 @@ var Player = (function () {
       this.canPlay = deffered;
       if (this.isBot) {
         setTimeout(function botMove() {
-          var position = { row: Player.randomCell(), col: Player.randomCell() };
-          console.log(position);
-          _this.canPlay.resolve(position);
-          _this.canPlay = false;
-        }, 500);
+          _this.mark(Player.randomCell(), Player.randomCell());
+        }, 200);
       }
       return this.canPlay.promise;
     }
@@ -271,7 +266,6 @@ var Player = (function () {
     key: 'mark',
     value: function mark(row, col) {
       if (this.canPlay) {
-        console.log(this);
         this.canPlay.resolve({ row: row, col: col });
         this.canPlay = false;
       }
