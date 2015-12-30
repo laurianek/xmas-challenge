@@ -18,7 +18,10 @@ var initApp = function initApp() {
   });
 };
 
-app.use(express.static('dist'));
+app.use(express.static('.'));
+app.get('/', function(req, res) {
+  res.redirect(301, 'dist/index.html');
+});
 
 // Start app server
 initApp();

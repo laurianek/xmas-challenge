@@ -4,7 +4,7 @@
   "description": "Lendable christmas challenge. Let's win it :)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "node_modules/.bin/bower install"
   },
   "repository": {
     "type": "git",
