@@ -17,16 +17,6 @@ class Player {
     }
   }
 
-  static colourArray() {
-    return [
-    'red',
-    'yellow',
-    'green',
-    'blue',
-    'pink'
-    ];
-  }
-
   static randomCell(){
     var a = Math.floor(Math.random() * 100);
     var boundary = Math.floor(100 / 3);
@@ -61,6 +51,12 @@ class Player {
   reset() {
     this.canPlay = false;
   }
-
-
 }
+
+Player.colourArray = [
+  'red',
+  'yellow',
+  'green',
+  'blue',
+  'pink'
+];

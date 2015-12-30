@@ -56,21 +56,21 @@ class Grid {
     var checks = [
       {
         cell: function hzw (position, i, j) { return _this.grid[position.row][i]; },
-        returnValue: Grid.enum().HZ_WIN
+        returnValue: Grid.constant.HZ_WIN
       },
       {
         cell: function vtw (position, i, j) { return _this.grid[i][position.col]; },
-        returnValue: Grid.enum().VT_WIN
+        returnValue: Grid.constant.VT_WIN
       },
       {
         cell: function lhdw(position, i, j) { return _this.grid[i][i]; },
         extraCheck(position) { return position.row !== position.col },
-        returnValue: Grid.enum().LHD_WIN
+        returnValue: Grid.constant.LHD_WIN
       },
       {
         cell: function rhdw(position, i, j) { return _this.grid[i][j]; },
         extraCheck(position) { return position.row !== _this.square - 1 - position.col },
-        returnValue: Grid.enum().RHD_WIN
+        returnValue: Grid.constant.RHD_WIN
       }
     ];
     var win = checks.reduce(function winReduceFn(previousValue, currentObj) {
@@ -84,13 +84,11 @@ class Grid {
     }
     return { isGameWon: false, winType: '', isGameOver: false };
   }
-
-  static enum() {
-    return {
-      HZ_WIN: 'horizontal win',
-      VT_WIN: 'vertical win',
-      LHD_WIN: 'left hand-side diagonal win',
-      RHD_WIN: 'right hand-side diagonal win'
-    }
-  }
 }
+
+Grid.constant = {
+  HZ_WIN: 'horizontal win',
+  VT_WIN: 'vertical win',
+  LHD_WIN: 'left hand-side diagonal win',
+  RHD_WIN: 'right hand-side diagonal win'
+};

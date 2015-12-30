@@ -172,12 +172,12 @@ var Grid = (function () {
         cell: function hzw(position, i, j) {
           return _this.grid[position.row][i];
         },
-        returnValue: Grid.enum().HZ_WIN
+        returnValue: Grid.constant.HZ_WIN
       }, {
         cell: function vtw(position, i, j) {
           return _this.grid[i][position.col];
         },
-        returnValue: Grid.enum().VT_WIN
+        returnValue: Grid.constant.VT_WIN
       }, {
         cell: function lhdw(position, i, j) {
           return _this.grid[i][i];
@@ -186,7 +186,7 @@ var Grid = (function () {
           return position.row !== position.col;
         },
 
-        returnValue: Grid.enum().LHD_WIN
+        returnValue: Grid.constant.LHD_WIN
       }, {
         cell: function rhdw(position, i, j) {
           return _this.grid[i][j];
@@ -195,7 +195,7 @@ var Grid = (function () {
           return position.row !== _this.square - 1 - position.col;
         },
 
-        returnValue: Grid.enum().RHD_WIN
+        returnValue: Grid.constant.RHD_WIN
       }];
       var win = checks.reduce(function winReduceFn(previousValue, currentObj) {
         if (previousValue) {
@@ -208,20 +208,17 @@ var Grid = (function () {
       }
       return { isGameWon: false, winType: '', isGameOver: false };
     }
-  }], [{
-    key: 'enum',
-    value: function _enum() {
-      return {
-        HZ_WIN: 'horizontal win',
-        VT_WIN: 'vertical win',
-        LHD_WIN: 'left hand-side diagonal win',
-        RHD_WIN: 'right hand-side diagonal win'
-      };
-    }
   }]);
 
   return Grid;
 })();
+
+Grid.constant = {
+  HZ_WIN: 'horizontal win',
+  VT_WIN: 'vertical win',
+  LHD_WIN: 'left hand-side diagonal win',
+  RHD_WIN: 'right hand-side diagonal win'
+};
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -278,11 +275,6 @@ var Player = (function () {
       this.canPlay = false;
     }
   }], [{
-    key: 'colourArray',
-    value: function colourArray() {
-      return ['red', 'yellow', 'green', 'blue', 'pink'];
-    }
-  }, {
     key: 'randomCell',
     value: function randomCell() {
       var a = Math.floor(Math.random() * 100);
@@ -300,6 +292,8 @@ var Player = (function () {
 
   return Player;
 })();
+
+Player.colourArray = ['red', 'yellow', 'green', 'blue', 'pink'];
 'use strict';
 
 var app = angular.module('tictactoe', []);
@@ -327,15 +321,14 @@ app.controller('mainCtrl', function ($scope, $q, GameConst) {
     _class: GameConst.CROSS_CLASS
   }, true);
   var isPlayer1Turn = true;
+
   $scope.players = [player1, player2];
   $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
-  $scope.colours = Player.colourArray();
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = function (row, col) {
     currentPlayer().mark(row, col);
   };
   $scope.replay = init;
-  $scope.getSymbolColour = getSymbolColour;
   init();
 
   function mark(position) {
@@ -385,6 +378,10 @@ app.controller('mainCtrl', function ($scope, $q, GameConst) {
     $scope.gameMode = GameConst.SINGLE_PLAYER;
     getUserMove();
   }
+
+  // *** colours
+  $scope.getSymbolColour = getSymbolColour;
+  $scope.colours = Player.colourArray;
   function getSymbolColour(obj) {
     if (obj.player) {
       return 'symbol-' + obj.player.colour;

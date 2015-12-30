@@ -10,13 +10,12 @@ app.controller('mainCtrl', function($scope, $q, GameConst) {
     _class: GameConst.CROSS_CLASS
   }, true);
   var isPlayer1Turn = true;
+
   $scope.players = [player1, player2];
   $scope.config = {colour: 'colour', symbol: 'marker', score: 'score'};
-  $scope.colours = Player.colourArray();
   $scope.isCurrentPlayer = isCurrentPlayer;
-  $scope.mark = function(row, col){ currentPlayer().mark(row, col); }
+  $scope.mark = function(row, col){ currentPlayer().mark(row, col); };
   $scope.replay = init;
-  $scope.getSymbolColour = getSymbolColour;
   init();
 
   function mark(position) {
@@ -66,6 +65,10 @@ app.controller('mainCtrl', function($scope, $q, GameConst) {
     $scope.gameMode = GameConst.SINGLE_PLAYER;
     getUserMove();
   }
+
+  // *** colours
+  $scope.getSymbolColour = getSymbolColour;
+  $scope.colours = Player.colourArray;
   function getSymbolColour(obj) {
     if(obj.player) {
       return `symbol-${obj.player.colour}`;
