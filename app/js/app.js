@@ -31,6 +31,7 @@ app.controller('mainCtrl', function($scope, GameConst) {
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = mark;
   $scope.replay = init;
+  $scope.getSymbolColour = getSymbolColour;
   init();
 
   function mark(row, col) {
@@ -68,5 +69,17 @@ app.controller('mainCtrl', function($scope, GameConst) {
   function init() {
     $scope.grid = new Grid();
     $scope.isGameOver = false;
+  }
+  function getSymbolColour(obj) {
+
+    if(obj.player) {
+      return `symbol-${obj.player.colour}`;
+    }
+    if(obj.marker) {
+      let player = player1.marker.symbol == obj.marker.symbol ? player1 : player2;
+      console.log(`symbol-${player.colour}`);
+      return `symbol-${player.colour}`;
+    }
+    return '';
   }
 });

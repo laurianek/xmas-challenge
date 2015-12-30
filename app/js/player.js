@@ -1,11 +1,11 @@
 'use strict';
 
 class Player {
-  constructor (name, marker, score = 0) {
+  constructor (name, marker, score = 0, colour = 'red') {
     this.name = name;
     this.marker = marker;
     this.score = score;
-    this.colour = null;
+    this.colour = colour;
   }
 
   addPoints(_point) {

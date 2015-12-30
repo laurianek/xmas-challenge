@@ -19,7 +19,7 @@
     <div class="grid" ng-cloak>
       <div class="grid__row" ng-repeat="col in grid.grid">
         <div class="grid__col" ng-repeat="row in col track by $index">
-      <span class="grid__cell symbol" ng-class="row?row._class : ''"
+      <span class="grid__cell symbol" ng-class="[row?row._class : '', getSymbolColour({marker: row})]"
           ng-click="mark($parent.$index, $index)">
         <span></span>
       </span>
@@ -34,7 +34,7 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-xs-6" ng-repeat="player in players">
+  <div class="col-sm-6 player-info" ng-repeat="player in players">
     <div class="panel panel-default"
          ng-class="{'panel-default': !isCurrentPlayer(player), 'panel-success': isCurrentPlayer(player)}">
       <div class="panel-heading">
@@ -45,7 +45,7 @@
       <div class="panel-body">
         <p>{{ config.symbol }}:
           <span class="symbol symbol--small"
-                ng-class="[player.marker._class, (player.colour ? 'symbol-' + player.colour : '')]"></span>
+                ng-class="[player.marker._class, getSymbolColour({player: player})]"></span>
         </p>
         <p>{{ config.score }}: <span>{{ player.score }} pts</span></p>
         <p>{{ config.colour }}:

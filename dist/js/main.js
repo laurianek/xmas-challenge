@@ -31,6 +31,7 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   $scope.isCurrentPlayer = isCurrentPlayer;
   $scope.mark = mark;
   $scope.replay = init;
+  $scope.getSymbolColour = getSymbolColour;
   init();
 
   function mark(row, col) {
@@ -68,6 +69,18 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   function init() {
     $scope.grid = new Grid();
     $scope.isGameOver = false;
+  }
+  function getSymbolColour(obj) {
+
+    if (obj.player) {
+      return 'symbol-' + obj.player.colour;
+    }
+    if (obj.marker) {
+      var player = player1.marker.symbol == obj.marker.symbol ? player1 : player2;
+      console.log('symbol-' + player.colour);
+      return 'symbol-' + player.colour;
+    }
+    return '';
   }
 });
 'use strict';
@@ -206,13 +219,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Player = (function () {
   function Player(name, marker) {
     var score = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+    var colour = arguments.length <= 3 || arguments[3] === undefined ? 'red' : arguments[3];
 
     _classCallCheck(this, Player);
 
     this.name = name;
     this.marker = marker;
     this.score = score;
-    this.colour = null;
+    this.colour = colour;
   }
 
   _createClass(Player, [{
