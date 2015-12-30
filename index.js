@@ -1,12 +1,11 @@
 // very small express server
 
 
-var app = require('express').createServer();
-//var io = require('socket.io')(app);
+var express = require('express');
+var app = express();
+//var io = require('socket.io')(server);
 
-app.listen(80);
-
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
   res.sendfile('dist/index.html');
 });
 
