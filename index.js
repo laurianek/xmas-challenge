@@ -3,11 +3,25 @@
 
 var express = require('express');
 var app = express();
+app.set('port', (process.env.PORT || 5000));
 //var io = require('socket.io')(server);
 
-app.get('/', function(req, res) {
-  res.sendfile('dist/index.html');
-});
+
+var initApp = function initApp() {
+
+  //create the http server and start it
+  //http.createServer(app).listen(9001,function() {
+  app.listen(app.get('port'),function() {
+
+    //a message to indicate a successful startup of the http server
+    console.log('Your Node.js application is listening on port #: ' + app.get('port'));
+  });
+};
+
+app.use(express.static('dist'));
+
+// Start app server
+initApp();
 
 //io.on('connection', function (socket) {
 //  socket.emit('news', { hello: 'world' });
