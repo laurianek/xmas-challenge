@@ -12,3 +12,14 @@ To setup locally please ensure you have `node v0.12.2` or higher and `npm v3.5.x
 
 This should be all set to go. 
 Visit [localhost:5000](http://localhost:5000) 'et Voila'; enjoy the noughs and crosses game.
+
+## Feautes
+- 2 players in the same browser
+- Play against the 'LUCK' bot
+- Toggle between Multiplayer and Solo mode
+- Alternate the starting player
+- Track scores
+- Pretty interface all the way down to mobile
+- Change the colour of your marker
+- Change your name and see it when you Win, (you can change the bot name too)
+- see all my commit in this git repos (please don't judge me on commit messages, I'm a very loose on commit messages for a solo projects 😊 )
