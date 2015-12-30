@@ -11,7 +11,7 @@ app.constant('GameConst', {
   DRAW_POINT: 0.5
 });
 
-app.controller('mainCtrl', function($scope, GameConst) {
+app.controller('mainCtrl', function($scope, $q, GameConst) {
   var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
@@ -19,7 +19,7 @@ app.controller('mainCtrl', function($scope, GameConst) {
   var player2 = new Player('Player 2', {
     symbol: GameConst.CROSS,
     _class: GameConst.CROSS_CLASS
-  });
+  }, true);
   var isPlayer1Turn = true;
   $scope.players = [player1, player2];
   $scope.config = {
@@ -29,18 +29,17 @@ app.controller('mainCtrl', function($scope, GameConst) {
   };
   $scope.colours = Player.colourArray();
   $scope.isCurrentPlayer = isCurrentPlayer;
-  $scope.mark = mark;
+  $scope.mark = function(row, col){ currentPlayer().mark(row, col); }
   $scope.replay = init;
   $scope.getSymbolColour = getSymbolColour;
   init();
 
-  function mark(row, col) {
-    var success = $scope.grid.mark({row: row, col: col}, currentPlayer().marker);
+  function mark(position) {
+    var success = $scope.grid.mark(position, currentPlayer().marker);
     if(!success) {
-      //maybe notify the user that marking failed
+      getUserMove();
       return;
     }
-    console.log(success);
     if (success.isGameOver) {
       $scope.isGameOver = true;
       if (success.isGameWon) {
@@ -56,6 +55,7 @@ app.controller('mainCtrl', function($scope, GameConst) {
       return;
     }
     changePlayer();
+    getUserMove();
   }
   function currentPlayer() {
     return isPlayer1Turn? player1 : player2;
@@ -63,12 +63,22 @@ app.controller('mainCtrl', function($scope, GameConst) {
   function changePlayer() {
     return isPlayer1Turn = !isPlayer1Turn;
   }
+  function getUserMove() {
+    console.log('get user move', currentPlayer());
+    var deffered = $q.defer();
+    var promise = currentPlayer().play(deffered);
+    promise.then(function success(value) {
+      console.log('got user move');
+      mark(value);
+    }, function failure(reason) {}, function notify() {})
+  }
   function isCurrentPlayer(player) {
     return player.marker === currentPlayer().marker;
   }
   function init() {
     $scope.grid = new Grid();
     $scope.isGameOver = false;
+    getUserMove();
   }
   function getSymbolColour(obj) {
 

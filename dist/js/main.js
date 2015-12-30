@@ -11,7 +11,7 @@ app.constant('GameConst', {
   DRAW_POINT: 0.5
 });
 
-app.controller('mainCtrl', function ($scope, GameConst) {
+app.controller('mainCtrl', function ($scope, $q, GameConst) {
   var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
@@ -19,7 +19,7 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   var player2 = new Player('Player 2', {
     symbol: GameConst.CROSS,
     _class: GameConst.CROSS_CLASS
-  });
+  }, true);
   var isPlayer1Turn = true;
   $scope.players = [player1, player2];
   $scope.config = {
@@ -29,18 +29,19 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   };
   $scope.colours = Player.colourArray();
   $scope.isCurrentPlayer = isCurrentPlayer;
-  $scope.mark = mark;
+  $scope.mark = function (row, col) {
+    currentPlayer().mark(row, col);
+  };
   $scope.replay = init;
   $scope.getSymbolColour = getSymbolColour;
   init();
 
-  function mark(row, col) {
-    var success = $scope.grid.mark({ row: row, col: col }, currentPlayer().marker);
+  function mark(position) {
+    var success = $scope.grid.mark(position, currentPlayer().marker);
     if (!success) {
-      //maybe notify the user that marking failed
+      getUserMove();
       return;
     }
-    console.log(success);
     if (success.isGameOver) {
       $scope.isGameOver = true;
       if (success.isGameWon) {
@@ -56,6 +57,7 @@ app.controller('mainCtrl', function ($scope, GameConst) {
       return;
     }
     changePlayer();
+    getUserMove();
   }
   function currentPlayer() {
     return isPlayer1Turn ? player1 : player2;
@@ -63,12 +65,22 @@ app.controller('mainCtrl', function ($scope, GameConst) {
   function changePlayer() {
     return isPlayer1Turn = !isPlayer1Turn;
   }
+  function getUserMove() {
+    console.log('get user move', currentPlayer());
+    var deffered = $q.defer();
+    var promise = currentPlayer().play(deffered);
+    promise.then(function success(value) {
+      console.log('got user move');
+      mark(value);
+    }, function failure(reason) {}, function notify() {});
+  }
   function isCurrentPlayer(player) {
     return player.marker === currentPlayer().marker;
   }
   function init() {
     $scope.grid = new Grid();
     $scope.isGameOver = false;
+    getUserMove();
   }
   function getSymbolColour(obj) {
 
@@ -218,8 +230,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Player = (function () {
   function Player(name, marker) {
-    var score = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-    var colour = arguments.length <= 3 || arguments[3] === undefined ? 'red' : arguments[3];
+    var isBot = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+    var score = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+    var colour = arguments.length <= 4 || arguments[4] === undefined ? 'red' : arguments[4];
 
     _classCallCheck(this, Player);
 
@@ -227,6 +240,8 @@ var Player = (function () {
     this.marker = marker;
     this.score = score;
     this.colour = colour;
+    this.isBot = isBot;
+    this.canPlay = false;
   }
 
   _createClass(Player, [{
@@ -237,10 +252,53 @@ var Player = (function () {
         this.score += point;
       }
     }
+  }, {
+    key: 'play',
+    value: function play(deffered) {
+      var _this = this;
+      this.canPlay = deffered;
+      if (this.isBot) {
+        setTimeout(function botMove() {
+          var position = { row: Player.randomCell(), col: Player.randomCell() };
+          console.log(position);
+          _this.canPlay.resolve(position);
+          _this.canPlay = false;
+        }, 500);
+      }
+      return this.canPlay.promise;
+    }
+  }, {
+    key: 'mark',
+    value: function mark(row, col) {
+      if (this.canPlay) {
+        console.log(this);
+        this.canPlay.resolve({ row: row, col: col });
+        this.canPlay = false;
+      }
+    }
+  }, {
+    key: 'reset',
+    value: function reset() {
+      this.canPlay = false;
+    }
   }], [{
     key: 'colourArray',
     value: function colourArray() {
       return ['red', 'yellow', 'green', 'blue', 'pink'];
+    }
+  }, {
+    key: 'randomCell',
+    value: function randomCell() {
+      var a = Math.floor(Math.random() * 100);
+      var boundary = Math.floor(100 / 3);
+      console.log('a', a, 'boundary', boundary);
+      if (0 <= a && a < boundary) {
+        return 0;
+      }
+      if (boundary <= a && a < 2 * boundary) {
+        return 1;
+      }
+      return 2;
     }
   }]);
 

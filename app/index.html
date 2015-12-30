@@ -20,9 +20,7 @@
       <div class="grid__row" ng-repeat="col in grid.grid">
         <div class="grid__col" ng-repeat="row in col track by $index">
       <span class="grid__cell symbol" ng-class="[row?row._class : '', getSymbolColour({marker: row})]"
-          ng-click="mark($parent.$index, $index)">
-        <span></span>
-      </span>
+          ng-click="mark($parent.$index, $index)"></span>
         </div>
       </div>
       <div class="grid-msg bg-success text-center" ng-show="isGameOver">
@@ -47,7 +45,7 @@
           <span class="symbol symbol--small"
                 ng-class="[player.marker._class, getSymbolColour({player: player})]"></span>
         </p>
-        <p>{{ config.score }}: <span>{{ player.score }} pts</span></p>
+        <p>{{ config.score }}: <span class="score">{{ player.score }} pts</span></p>
         <p>{{ config.colour }}:
           <button class="colour-pick colour-pick-{{colour}} text-hide"
                   ng-repeat="colour in colours" ng-click="player.colour = colour"
