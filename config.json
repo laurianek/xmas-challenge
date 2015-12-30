@@ -12,6 +12,11 @@
       "app/js/gameconst.js",
       "app/js/mainctrl.js"
     ],
-    "css": "app/less/*.less"
+    "css": "app/less/*.less",
+    "buildConfig": [
+      "gulpfile.js",
+      "config.json",
+      "package.json"
+    ]
   }
 }

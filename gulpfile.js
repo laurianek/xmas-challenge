@@ -43,14 +43,22 @@ gulp.task('html', function() {
     .pipe(plugins.htmlmin({
       collapseWhitespace: true,
       conservativeCollapse: true,
-      useShortDoctype: true
+      useShortDoctype: true,
+      minifyURLs: {}
     }))
     .pipe(gulp.dest('dist'))
+});
+
+gulp.task('config:reload', function(){
+  return gulp.src(config.paths.buildConfig)
+    .pipe( plugins.reload())
+    .end();
 });
 
 gulp.task('watch', function () {
   var jsWatcher = gulp.watch(config.paths.js, ['js']);
   var cssWatcher = gulp.watch(config.paths.css, ['css']);
+  gulp.watch(config.paths.buildConfig, ['config:reload']);
   jsWatcher.on('change', watchLog);
   cssWatcher.on('change', watchLog);
   function watchLog(event) {
