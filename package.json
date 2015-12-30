@@ -4,7 +4,8 @@
   "description": "Lendable christmas challenge. Let's win it :)",
   "main": "index.js",
   "scripts": {
-    "postinstall": "node_modules/.bin/bower install"
+    "postinstall": "node_modules/.bin/bower install",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
