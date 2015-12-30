@@ -33,6 +33,11 @@ gulp.task('css', function() {
     .pipe(gulp.dest('dist/css'));
 });
 
+gulp.task('font', function() {
+  return gulp.src('app/fonts/*')
+    .pipe(gulp.dest('dist/fonts'));
+});
+
 gulp.task('watch', function () {
   var jsWatcher = gulp.watch(config.paths.js, ['js']);
   var cssWatcher = gulp.watch(config.paths.css, ['css']);
