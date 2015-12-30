@@ -314,101 +314,163 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ColourService = (function () {
-  function ColourService() {
-    _classCallCheck(this, ColourService);
-  }
-
-  _createClass(ColourService, [{
-    key: 'getSymbolColour',
-    value: function getSymbolColour(obj, players) {
-      if (obj.player) {
-        return 'symbol-' + obj.player.colour;
-      }
-      if (obj.marker) {
-        var player = players[0].marker.symbol == obj.marker.symbol ? players[0] : players[1];
-        return 'symbol-' + player.colour;
-      }
-      return '';
+(function () {
+  var ColourService = (function () {
+    function ColourService() {
+      _classCallCheck(this, ColourService);
     }
-  }]);
 
-  return ColourService;
+    _createClass(ColourService, [{
+      key: 'getSymbolColour',
+      value: function getSymbolColour(obj, players) {
+        if (obj.player) {
+          return 'symbol-' + obj.player.colour;
+        }
+        if (obj.marker) {
+          var player = players[0].marker.symbol == obj.marker.symbol ? players[0] : players[1];
+          return 'symbol-' + player.colour;
+        }
+        return '';
+      }
+    }]);
+
+    return ColourService;
+  })();
+
+  app.service('ColourService', ColourService);
 })();
-
-app.service('ColourService', ColourService);
 'use strict';
 
-app.controller('mainCtrl', function ($scope, $q, GameConst, ColourService) {
+app.factory('GamePlayService', function (GameConst, $q) {
+
+  // Service variables
+
+  var grid;
+  var isPlayer1Turn;
+  var player1Start;
+  var gameOutcomeMsg = '';
+
   var player1 = new Player('Player 1', {
     symbol: GameConst.NOUGHT,
     _class: GameConst.NOUGHT_CLASS
   });
+
   var player2 = new Player('Player 2 (bot)', {
     symbol: GameConst.CROSS,
     _class: GameConst.CROSS_CLASS
   }, true);
-  var isPlayer1Turn = true;
 
-  $scope.players = [player1, player2];
-  $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
-  $scope.isCurrentPlayer = isCurrentPlayer;
-  $scope.colours = Player.colourArray;
-  $scope.mark = function (row, col) {
-    currentPlayer().mark(row, col);
+  var gameMode = {
+    mode: GameConst.SINGLE_PLAYER,
+    sessionPlayer: player1
   };
-  $scope.getSymbolColour = function (obj) {
-    return ColourService.getSymbolColour(obj, $scope.players);
-  };
-  $scope.replay = init;
-  init();
 
-  function mark(position) {
-    var success = $scope.grid.mark(position, currentPlayer().marker);
-    if (!success) {
-      getUserMove();
-      return;
+  // Service functions
+  function getGrid() {
+    if (!grid) {
+      newGame();
     }
-    if (success.isGameOver) {
-      $scope.isGameOver = true;
-      if (success.isGameWon) {
-        currentPlayer().addPoints(GameConst.WIN_POINT);
-        $scope.msg = currentPlayer().name + ' won this round!';
-      } else {
-        $scope.players.forEach(function (player) {
-          player.addPoints(GameConst.DRAW_POINT);
-        });
-        $scope.msg = 'Draw!';
-      }
-      //save game points
-      return;
-    }
-    changePlayer();
-    getUserMove();
+    return grid;
   }
-  function currentPlayer() {
-    return isPlayer1Turn ? player1 : player2;
+  function getPlayers() {
+    return [player1, player2];
+  }
+  function newGame() {
+    grid = new Grid();
+    player1Start = typeof player1Start === 'undefined' ? true : !player1Start;
+    isPlayer1Turn = player1Start;
+    gameOutcomeMsg = '';
+    getCurrentPlayerMove();
   }
   function changePlayer() {
     return isPlayer1Turn = !isPlayer1Turn;
   }
-  function getUserMove() {
-    console.log('get user move', currentPlayer());
-    var deffered = $q.defer();
-    var promise = currentPlayer().play(deffered);
-    promise.then(function success(value) {
-      console.log('got user move');
-      mark(value);
-    }, function failure(reason) {}, function notify() {});
+  function currentPlayer() {
+    return isPlayer1Turn ? player1 : player2;
   }
   function isCurrentPlayer(player) {
     return player.marker === currentPlayer().marker;
   }
-  function init() {
-    $scope.grid = new Grid();
-    $scope.isGameOver = false;
-    $scope.gameMode = GameConst.SINGLE_PLAYER;
-    getUserMove();
+  function isGameOver() {
+    return getGrid().gameOver;
   }
+  function markHandler(row, col) {
+    if (gameMode.mode === GameConst.SINGLE_PLAYER && currentPlayer() === gameMode.sessionPlayer) {
+      currentPlayer().mark(row, col);
+    } else if (gameMode.mode === GameConst.MULTI_PLAYER) {
+      currentPlayer().mark(row, col);
+    }
+  }
+  function getCurrentPlayerMove() {
+    console.log('get user move', currentPlayer());
+    var playerDeferred = $q.defer();
+    currentPlayer().play(playerDeferred).then(function success(position) {
+      console.log('got user move');
+      mark(position);
+    });
+  }
+  function mark(position) {
+    var game = getGrid().mark(position, currentPlayer().marker);
+    if (!game) {
+      getCurrentPlayerMove();
+      return;
+    }
+    //save game points
+    if (game.isGameOver) {
+      if (game.isGameWon) {
+        currentPlayer().addPoints(GameConst.WIN_POINT);
+        gameOutcomeMsg = currentPlayer().name + ' won this round!';
+        return;
+      }
+      getPlayers().forEach(function (player) {
+        player.addPoints(GameConst.DRAW_POINT);
+      });
+      gameOutcomeMsg = 'Draw!';
+      return;
+    }
+    changePlayer();
+    getCurrentPlayerMove();
+  }
+  function getGameOutcomeMsg() {
+    return gameOutcomeMsg;
+  }
+
+  // returned API
+  return {
+    getGrid: getGrid,
+    getPlayers: getPlayers,
+    getGameOutcomeMsg: getGameOutcomeMsg,
+    isCurrentPlayer: isCurrentPlayer,
+    newGame: newGame,
+    isGameOver: isGameOver,
+    markHandler: markHandler
+  };
+});
+'use strict';
+
+app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, ColourService) {
+  $scope.players = GamePlayService.getPlayers();
+  $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
+  $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
+  $scope.colours = Player.colourArray;
+  $scope.getSymbolColour = function (obj) {
+    return ColourService.getSymbolColour(obj, GamePlayService.getPlayers());
+  };
+  $scope.mark = GamePlayService.markHandler;
+  $scope.replay = init;
+  init();
+
+  function init() {
+    GamePlayService.newGame();
+    $scope.grid = GamePlayService.getGrid();
+    $scope.isGameOver = GamePlayService.isGameOver();
+  }
+
+  $scope.$watch(function () {
+    return GamePlayService.isGameOver();
+  }, function (newVal) {
+    $scope.isGameOver = newVal;
+    $scope.msg = GamePlayService.getGameOutcomeMsg();
+  });
 });
 //# sourceMappingURL=main.js.map

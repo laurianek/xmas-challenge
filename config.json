@@ -11,6 +11,7 @@
       "app/js/app.js",
       "app/js/gameconst.js",
       "app/js/colourservice.js",
+      "app/js/gameplayservice.js",
       "app/js/mainctrl.js"
     ],
     "css": "app/less/*.less",
