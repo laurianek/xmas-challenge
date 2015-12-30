@@ -55,10 +55,8 @@ app.factory('GamePlayService', function (GameConst, $q) {
     }
   }
   function getCurrentPlayerMove() {
-    console.log('get user move', currentPlayer());
     var playerDeferred = $q.defer();
     currentPlayer().play(playerDeferred).then(function success(position) {
-      console.log('got user move');
       mark(position);
     });
   }
