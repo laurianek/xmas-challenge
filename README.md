@@ -7,11 +7,11 @@ The live app version is available now at [laurianetictactoe.herokuapp.com](http:
 To setup locally please ensure you have `node v0.12.2` or higher and `npm v3.5.x` or higher:
 
 1. first clone this git repos.
-2. Then run `npm install`. This should install all dependencies and run `bower install`. If it didn't run it manually
+2. Then run `npm install --production`. This should install all dependencies and run `bower install`. If it didn't run it manually
 3. Start the application with `node index.js`
 
 This should be all set to go. 
-Visit [localhost:5000](http://localhost:5000) 'et Voila'; enjoy the noughs and crosses game.
+Visit [localhost:5000](http://localhost:5000) 'et Voila'; enjoy a game Noughts and Crosses.
 
 ## Feautes
 - 2 players in the same browser
@@ -22,4 +22,4 @@ Visit [localhost:5000](http://localhost:5000) 'et Voila'; enjoy the noughs and c
 - Pretty interface all the way down to mobile
 - Change the colour of your marker
 - Change your name and see it when you Win, (you can change the bot name too)
-- see all my commit in this git repos (please don't judge me on commit messages, I'm a very loose on commit messages for a solo projects 😊 )
+- see all my commit in this git repos ( please don't judge me on commit messages, I'm a very loose on commit messages for a solo projects 😊 )
