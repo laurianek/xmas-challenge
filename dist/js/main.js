@@ -125,12 +125,12 @@ var Grid = (function () {
       if (this.gameOver) {
         return false;
       }
-      if (!this.withinGridBounds(position) || this.isAlreayMarked(position)) {
+      if (!this._withinGridBounds(position) || this._isAlreayMarked(position)) {
         return false;
       }
       this.grid[position.row][position.col] = marker;
       this.freeCell--;
-      var game = this.gameWon(position);
+      var game = this._gameWon(position);
       if (game.isGameOver) {
         this.gameOver = game.isGameOver;
         return game;
@@ -140,18 +140,18 @@ var Grid = (function () {
       return game;
     }
   }, {
-    key: 'withinGridBounds',
-    value: function withinGridBounds(position) {
+    key: '_withinGridBounds',
+    value: function _withinGridBounds(position) {
       return position.row >= 0 && position.row < this.square && position.col >= 0 && position.col < this.square;
     }
   }, {
-    key: 'isAlreayMarked',
-    value: function isAlreayMarked(position) {
+    key: '_isAlreayMarked',
+    value: function _isAlreayMarked(position) {
       return this.grid[position.row][position.col];
     }
   }, {
-    key: 'winReduce',
-    value: function winReduce(position, mark, fns) {
+    key: '_winReduce',
+    value: function _winReduce(position, mark, fns) {
       if (fns.extraCheck && fns.extraCheck(position)) {
         return false;
       }
@@ -164,10 +164,10 @@ var Grid = (function () {
       return fns.returnValue;
     }
   }, {
-    key: 'gameWon',
-    value: function gameWon(position) {
+    key: '_gameWon',
+    value: function _gameWon(position) {
       var _this = this;
-      var currentMark = this.isAlreayMarked(position);
+      var currentMark = this._isAlreayMarked(position);
       var checks = [{
         cell: function hzw(position, i, j) {
           return _this.grid[position.row][i];
@@ -201,7 +201,7 @@ var Grid = (function () {
         if (previousValue) {
           return previousValue;
         }
-        return _this.winReduce(position, currentMark, currentObj);
+        return _this._winReduce(position, currentMark, currentObj);
       }, false);
       if (win) {
         return { isGameWon: true, winType: win, isGameOver: true };
@@ -343,8 +343,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 app.factory('GamePlayService', function (GameConst, $q) {
 
-  // Service variables
-
+  // *** Service variables ***
   var grid;
   var isPlayer1Turn;
   var player1Start;
@@ -360,7 +359,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
     players: [player1, player2]
   };
 
-  // Service functions
+  // *** Service functions ***
   function getGrid() {
     if (!grid) {
       newGame();
@@ -459,7 +458,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
     }, isBot);
   }
 
-  // returned API
+  // *** returned API ***
   return {
     getGrid: getGrid,
     getPlayers: getPlayers,

@@ -17,12 +17,12 @@ class Grid {
     if (this.gameOver) {
       return false;
     }
-    if (!this.withinGridBounds(position) || this.isAlreayMarked(position)) {
+    if (!this._withinGridBounds(position) || this._isAlreayMarked(position)) {
       return false;
     }
     this.grid[position.row][position.col] = marker;
     this.freeCell--;
-    var game = this.gameWon(position);
+    var game = this._gameWon(position);
     if (game.isGameOver) {
       this.gameOver = game.isGameOver;
       return game;
@@ -31,14 +31,14 @@ class Grid {
     this.gameOver = game.isGameOver;
     return game;
   }
-  withinGridBounds(position) {
+  _withinGridBounds(position) {
     return (position.row >= 0 && position.row < this.square) &&
       (position.col >= 0 && position.col < this.square);
   }
-  isAlreayMarked(position) {
+  _isAlreayMarked(position) {
     return this.grid[position.row][position.col];
   }
-  winReduce(position, mark, fns) {
+  _winReduce(position, mark, fns) {
     if(fns.extraCheck && fns.extraCheck(position)) {
       return false;
     }
@@ -50,9 +50,9 @@ class Grid {
     }
     return fns.returnValue;
   }
-  gameWon(position) {
+  _gameWon(position) {
     var _this = this;
-    var currentMark = this.isAlreayMarked(position);
+    var currentMark = this._isAlreayMarked(position);
     var checks = [
       {
         cell: function hzw (position, i, j) { return _this.grid[position.row][i]; },
@@ -77,7 +77,7 @@ class Grid {
       if (previousValue) {
         return previousValue;
       }
-      return _this.winReduce(position, currentMark, currentObj);
+      return _this._winReduce(position, currentMark, currentObj);
     }, false);
     if (win) {
       return { isGameWon: true, winType: win, isGameOver: true };
