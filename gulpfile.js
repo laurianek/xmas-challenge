@@ -7,13 +7,14 @@ const LessPluginCleanCSS = require('less-plugin-clean-css');
 const LessPluginAutoPrefix = require('less-plugin-autoprefix');
 const cleancss = new LessPluginCleanCSS({ advanced: true });
 const autoprefix= new LessPluginAutoPrefix({ browsers: ["last 4 versions"] });
+const Server = require('karma').Server;
 
 const config = require('./config.json');
 
 gulp.task('default', plugins.taskListing);
 
-gulp.task('js', function() {
-  return gulp.src(config.paths.orderedJs)
+gulp.task('build:js', function() {
+  return gulp.src(config.paths.js.ordered)
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.babel({
       presets: ['es2015']
@@ -23,7 +24,7 @@ gulp.task('js', function() {
     .pipe(gulp.dest('dist/js'));
 });
 
-gulp.task('css', function() {
+gulp.task('build:css', function() {
   return gulp.src('app/less/main.less')
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.less({
@@ -33,12 +34,12 @@ gulp.task('css', function() {
     .pipe(gulp.dest('dist/css'));
 });
 
-gulp.task('font', function() {
+gulp.task('build:font', function() {
   return gulp.src('app/fonts/*')
     .pipe(gulp.dest('dist/fonts'));
 });
 
-gulp.task('html', function() {
+gulp.task('build:html', function() {
   return gulp.src('app/*.html')
     .pipe(plugins.htmlmin({
       collapseWhitespace: true,
@@ -58,8 +59,8 @@ gulp.task('config:reload', function(){
 
 gulp.task('watch', function () {
   gulp.watch(config.paths.buildConfig, ['config:reload']);
-  var jsWatcher = gulp.watch(config.paths.js, ['js']);
-  var cssWatcher = gulp.watch(config.paths.css, ['css']);
+  var jsWatcher = gulp.watch(config.paths.js.src, ['build:js']);
+  var cssWatcher = gulp.watch(config.paths.css, ['build:css']);
   jsWatcher.on('change', watchLog);
   cssWatcher.on('change', watchLog);
   function watchLog(event) {
@@ -68,5 +69,19 @@ gulp.task('watch', function () {
   }
 });
 
-gulp.task('dist', ['html','js','css','font']);
+gulp.task('test', function(done) {
+  new Server({
+    configFile: 'karma.conf.js',
+    singleRun: true
+  }, done).start();
+});
+
+gulp.task('test:watch', function() {
+  new Server({
+    configFile: 'karma.conf.js',
+    singleRun: false
+  }, done).start();
+});
+
+gulp.task('build', ['build:html','build:js','build:css','build:font']);
 
