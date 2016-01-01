@@ -250,8 +250,8 @@ var Player = (function () {
       }
     }
   }, {
-    key: 'play',
-    value: function play(deffered) {
+    key: 'setCanPlay',
+    value: function setCanPlay(deffered) {
       var _this = this;
       this.canPlay = deffered;
       if (this.isBot) {
@@ -398,7 +398,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
   }
   function getCurrentPlayerMove() {
     var playerDeferred = $q.defer();
-    currentPlayer().play(playerDeferred).then(function success(position) {
+    currentPlayer().setCanPlay(playerDeferred).then(function success(position) {
       mark(position);
     });
   }

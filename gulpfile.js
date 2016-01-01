@@ -71,15 +71,16 @@ gulp.task('watch', function () {
 
 gulp.task('test', function(done) {
   new Server({
-    configFile: 'karma.conf.js',
+    configFile: __dirname + '/karma.conf.js',
     singleRun: true
   }, done).start();
 });
 
-gulp.task('test:watch', function() {
+gulp.task('test:watch', function(done) {
   new Server({
-    configFile: 'karma.conf.js',
-    singleRun: false
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: false,
+    autoWatch: true
   }, done).start();
 });
 

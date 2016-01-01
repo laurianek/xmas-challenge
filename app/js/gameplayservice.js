@@ -56,7 +56,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
   }
   function getCurrentPlayerMove() {
     var playerDeferred = $q.defer();
-    currentPlayer().play(playerDeferred).then(function success(position) {
+    currentPlayer().setCanPlay(playerDeferred).then(function success(position) {
       mark(position);
     });
   }

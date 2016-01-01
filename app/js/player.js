@@ -29,7 +29,7 @@ class Player {
     return 2;
   }
 
-  play(deffered) {
+  setCanPlay(deffered) {
     var _this = this;
     this.canPlay = deffered;
     if(this.isBot) {
