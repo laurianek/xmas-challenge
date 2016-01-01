@@ -256,7 +256,7 @@ var Player = (function () {
       this.canPlay = deffered;
       if (this.isBot) {
         setTimeout(function botMove() {
-          _this.mark(Player.randomCell(), Player.randomCell());
+          _this.mark(Player.getRandomCell(), Player.getRandomCell());
         }, 200);
       }
       return this.canPlay.promise;
@@ -275,8 +275,8 @@ var Player = (function () {
       this.canPlay = false;
     }
   }], [{
-    key: 'randomCell',
-    value: function randomCell() {
+    key: 'getRandomCell',
+    value: function getRandomCell() {
       var a = Math.floor(Math.random() * 100);
       var boundary = Math.floor(100 / 3);
       if (0 <= a && a < boundary) {
