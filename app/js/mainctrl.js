@@ -19,7 +19,7 @@ app.controller('mainCtrl', function($scope, $q, GameConst, GamePlayService, Colo
   }
   function switchPlayMode() {
     GamePlayService.switchPlayMode();
-    $scope.switchText = GamePlayService.getCurrentPlayMode === GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
+    $scope.switchText = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
     $scope.players = GamePlayService.getPlayers();
     $scope.grid = GamePlayService.getGrid();
     $scope.isGameOver = GamePlayService.isGameOver();
