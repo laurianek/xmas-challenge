@@ -1,6 +1,6 @@
 {
   "name": "xmas-challenge",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Lendable christmas challenge. Let's win it :)",
   "main": "index.js",
   "scripts": {
