@@ -15,6 +15,10 @@ gulp.task('default', plugins.taskListing);
 
 gulp.task('build:es6', function() {
   return gulp.src(config.paths.js.es6)
+    .pipe(plugins.changed('app/js/src'))
+    .pipe(plugins.ngAnnotate({
+      single_quotes: true
+    }))
     .pipe(plugins.babel({
       presets: ['es2015']
     }))

@@ -1,6 +1,6 @@
 'use strict';
 
-app.factory('GamePlayService', ['GameConst', '$q', function (GameConst, $q) {
+app.factory('GamePlayService', function (GameConst, $q) {
 
   // *** Service variables ***
   var grid;
@@ -130,4 +130,4 @@ app.factory('GamePlayService', ['GameConst', '$q', function (GameConst, $q) {
     switchPlayMode: switchPlayMode,
     getCurrentPlayMode: getCurrentPlayMode
   };
-}]);
+});

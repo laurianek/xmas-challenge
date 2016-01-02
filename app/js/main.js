@@ -29351,7 +29351,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 })();
 'use strict';
 
-app.factory('GamePlayService', ['GameConst', '$q', function (GameConst, $q) {
+app.factory('GamePlayService', ["GameConst", "$q", function (GameConst, $q) {
 
   // *** Service variables ***
   var grid;
@@ -29485,7 +29485,7 @@ app.factory('GamePlayService', ['GameConst', '$q', function (GameConst, $q) {
 }]);
 'use strict';
 
-app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'ColourService', function ($scope, $q, GameConst, GamePlayService, ColourService) {
+app.controller('mainCtrl', ["$scope", "$q", "GameConst", "GamePlayService", "ColourService", function ($scope, $q, GameConst, GamePlayService, ColourService) {
   $scope.players = GamePlayService.getPlayers();
   $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
   $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
