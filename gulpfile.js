@@ -13,31 +13,27 @@ const config = require('./config.json');
 
 gulp.task('default', plugins.taskListing);
 
-gulp.task('build:js', function() {
+gulp.task('build:es6', function() {
   return gulp.src(config.paths.js.es6)
-    .pipe(plugins.sourcemaps.init())
     .pipe(plugins.babel({
       presets: ['es2015']
     }))
     .pipe(gulp.dest('app/js/src'))
-    .pipe(plugins.concat('main.js'))
-    .pipe(plugins.sourcemaps.write('.'))
-    .pipe(gulp.dest('app/js'))
     ;
 });
 
-gulp.task('dist:js', ['build:js'], function() {
+gulp.task('build:js', ['build:es6'], function() {
   return gulp.src(config.paths.js.ordered)
-    .pipe(plugins.sourcemaps.init())
-    .pipe(plugins.babel({
-      presets: ['es2015']
-    }))
     .pipe(plugins.concat('main.js'))
+    .pipe(gulp.dest('app/js'))
+    .pipe(plugins.sourcemaps.init())
     .pipe(plugins.uglify())
     .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest('dist/js'))
     ;
 });
+
+gulp.task('dist:js', ['build:js']);
 
 gulp.task('build:css', function() {
   return gulp.src('app/less/main.less')
