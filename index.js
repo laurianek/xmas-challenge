@@ -18,9 +18,10 @@ var initApp = function initApp() {
   });
 };
 
-app.use(express.static('.'));
+app.use('/', express.static('dist'));
+app.use('/coverage', express.static(__dirname + '/coverage/PhantomJs\ 1.9.8\ (Mac\ OS\ X 0.0.0)'));
 app.get('/', function(req, res) {
-  res.redirect(301, 'dist/index.html');
+  res.redirect(301, '/');
 });
 
 // Start app server
