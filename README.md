@@ -9,21 +9,24 @@ See the [test coverage](http://laurianetictactoe.herokuapp.com/coverage)
 To setup locally please ensure that you have `node v0.12.2` or higher and `npm v3.5.x` or higher:
 
 1. First clone this git repository: `git clone git@github.com:laurianek/xmas-challenge.git` or `git clone https://github.com/laurianek/xmas-challenge.git`
-2. Then run `npm install --production`. This should install all dependencies and run `bower install`. If it didn't run it manually
+2. Then run `npm install --production`. This should install all dependencies and run `bower install`. If it doesn't run, please run it manually
 3. Start the application with `node index.js`
 
-This should be all set to go. 
-Visit [localhost:5000](http://localhost:5000) 'et Voila'; enjoy a game Noughts and Crosses.
+This should be all set and ready to go. 
+Visit [localhost:5000](http://localhost:5000) 'et Voila'.
+
+Enjoy a game Noughts and Crosses!
 
 ## Features
 - 2 players in the same browser
 - Play against the 'LUCK' bot
 - Toggle between Multiplayer and Solo mode
-- Alternate the starting player
+- Alternate starting player
 - Track scores
 - Pretty interface all the way down to mobile
-- Change the colour of your marker
-- Change your name and see it when you Win, (you can change the bot name too)
-- see all my commit in this git repos 
-- unit / behavior tests, coverage **above 90%**
-- automatic deployements from git repository
+- Changing the colour of your marker
+- Changing your name and see it when you Win, (you can change the bot name too)
+- See all my commits in this git repos 
+- unit / behaviour tests 
+- coverage **above 90%**
+- Automatic deployments from git repository
