@@ -19,7 +19,7 @@ var initApp = function initApp() {
 };
 
 app.use('/', express.static('dist'));
-app.use('/coverage', express.static(__dirname + '/coverage/PhantomJs\ 1.9.8\ (Mac\ OS\ X 0.0.0)'));
+app.use('/coverage', express.static(__dirname + '/coverage/PhantomJS'));
 app.get('/', function(req, res) {
   res.redirect(301, '/');
 });
