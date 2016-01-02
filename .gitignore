@@ -11,7 +11,8 @@ pids
 lib-cov
 
 # Coverage directory used by tools like istanbul
-# coverage
+coverage/PhantomJS 1.9.8 (Mac OS X 0.0.0)/*
+
 
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git

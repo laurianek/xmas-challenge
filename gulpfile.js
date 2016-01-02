@@ -88,11 +88,20 @@ gulp.task('watch', function () {
   }
 });
 
-gulp.task('test', function(done) {
+gulp.task('test:main', function(done) {
   new Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
   }, done).start();
+});
+
+gulp.task('test', ['test:main'], function() {
+  return gulp.src('coverage/**/*')
+    .pipe(plugins.rename(function(path) {
+      path.dirname = path.dirname.replace(/PhantomJS[^\/]*/g, 'PhantomJS');
+    }))
+    .pipe(gulp.dest('coverage'))
+    ;
 });
 
 gulp.task('test:watch', function(done) {
@@ -104,5 +113,5 @@ gulp.task('test:watch', function(done) {
 });
 
 gulp.task('build', ['build:js','build:css']);
-gulp.task('dist', ['dist:html','dist:js','dist:css','dist:font']);
+gulp.task('dist', ['dist:html','dist:js','dist:css','dist:font', 'test']);
 
