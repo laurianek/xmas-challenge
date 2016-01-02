@@ -6,9 +6,9 @@ The live app version is available now at [laurianetictactoe.herokuapp.com](http:
 
 See the [test coverage](http://laurianetictactoe.herokuapp.com/coverage)
 
-To setup locally please ensure you have `node v0.12.2` or higher and `npm v3.5.x` or higher:
+To setup locally please ensure that you have `node v0.12.2` or higher and `npm v3.5.x` or higher:
 
-1. first clone this git repos.
+1. First clone this git repository: `git clone git@github.com:laurianek/xmas-challenge.git` or `git clone https://github.com/laurianek/xmas-challenge.git`
 2. Then run `npm install --production`. This should install all dependencies and run `bower install`. If it didn't run it manually
 3. Start the application with `node index.js`
 
