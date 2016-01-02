@@ -4,6 +4,9 @@
       "src": [
         "app/js/**/*.js"
       ],
+      "es6": [
+        "app/es6/**/*.js"
+      ],
       "ordered": [
         "app/js/lib/arrayForEachPolyfill.js",
         "app/js/lib/arrayReducePolyfill.js",
@@ -18,7 +21,8 @@
       "test": [
         "bower_components/angular/angular.js",
         "bower_components/angular-mocks/angular-mocks.js",
-        "dist/js/main.js",
+        "app/js/lib/**/*.js",
+        "app/js/src/**/*.js",
         "test/**/*Spec.js"
       ]
     },

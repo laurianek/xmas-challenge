@@ -14,14 +14,29 @@ const config = require('./config.json');
 gulp.task('default', plugins.taskListing);
 
 gulp.task('build:js', function() {
+  return gulp.src(config.paths.js.es6)
+    .pipe(plugins.sourcemaps.init())
+    .pipe(plugins.babel({
+      presets: ['es2015']
+    }))
+    .pipe(gulp.dest('app/js/src'))
+    .pipe(plugins.concat('main.js'))
+    .pipe(plugins.sourcemaps.write('.'))
+    .pipe(gulp.dest('app/js'))
+    ;
+});
+
+gulp.task('dist:js', ['build:js'], function() {
   return gulp.src(config.paths.js.ordered)
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.babel({
       presets: ['es2015']
     }))
     .pipe(plugins.concat('main.js'))
+    .pipe(plugins.uglify())
     .pipe(plugins.sourcemaps.write('.'))
-    .pipe(gulp.dest('dist/js'));
+    .pipe(gulp.dest('dist/js'))
+    ;
 });
 
 gulp.task('build:css', function() {
@@ -31,15 +46,18 @@ gulp.task('build:css', function() {
       plugins: [cleancss, autoprefix]
     }))
     .pipe(plugins.sourcemaps.write('.'))
-    .pipe(gulp.dest('dist/css'));
+    .pipe(gulp.dest('app/css'))
+    .pipe(gulp.dest('dist/css'))
+    ;
 });
+gulp.task('dist:css', ['build:css']);
 
-gulp.task('build:font', function() {
+gulp.task('dist:font', function() {
   return gulp.src('app/fonts/*')
     .pipe(gulp.dest('dist/fonts'));
 });
 
-gulp.task('build:html', function() {
+gulp.task('dist:html', function() {
   return gulp.src('app/*.html')
     .pipe(plugins.htmlmin({
       collapseWhitespace: true,
@@ -59,7 +77,7 @@ gulp.task('config:reload', function(){
 
 gulp.task('watch', function () {
   gulp.watch(config.paths.buildConfig, ['config:reload']);
-  var jsWatcher = gulp.watch(config.paths.js.src, ['build:js']);
+  var jsWatcher = gulp.watch(config.paths.js.es6, ['build:js']);
   var cssWatcher = gulp.watch(config.paths.css, ['build:css']);
   gulp.run('test:watch');
   jsWatcher.on('change', watchLog);
@@ -85,5 +103,6 @@ gulp.task('test:watch', function(done) {
   }, done).start();
 });
 
-gulp.task('build', ['build:html','build:js','build:css','build:font']);
+gulp.task('build', ['build:js','build:css']);
+gulp.task('dist', ['dist:html','dist:js','dist:css','dist:font']);
 

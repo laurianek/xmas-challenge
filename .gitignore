@@ -20,3 +20,4 @@ bower_components
 
 # IDEA directories
 .idea/
+app/js/src
