@@ -54,6 +54,7 @@ describe("The mainCtrl", function() {
     expect(GamePlayService.switchPlayMode).not.toHaveBeenCalled();
 
     $scope.switchPlayMode();
+    $scope.$apply();
     result = GamePlayService.getCurrentPlayMode();
     expect(result).toEqual(GameConst.MULTI_PLAYER);
     expect(GamePlayService.getCurrentPlayMode).toHaveBeenCalledTimes(3);
