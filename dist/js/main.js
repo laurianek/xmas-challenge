@@ -407,7 +407,6 @@ app.factory('GamePlayService', function (GameConst, $q) {
       getCurrentPlayerMove();
       return;
     }
-    //save game points
     if (game.isGameOver) {
       if (game.isGameWon) {
         currentPlayer().addPoints(GameConst.WIN_POINT);
@@ -457,6 +456,9 @@ app.factory('GamePlayService', function (GameConst, $q) {
       _class: GameConst.NOUGHT_CLASS
     }, isBot);
   }
+  function getCurrentPlayMode() {
+    return gameMode.mode;
+  }
 
   // *** returned API ***
   return {
@@ -467,7 +469,8 @@ app.factory('GamePlayService', function (GameConst, $q) {
     newGame: newGame,
     isGameOver: isGameOver,
     markHandler: markHandler,
-    switchPlayMode: switchPlayMode
+    switchPlayMode: switchPlayMode,
+    getCurrentPlayMode: getCurrentPlayMode
   };
 });
 'use strict';
@@ -492,8 +495,8 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
     $scope.isGameOver = GamePlayService.isGameOver();
   }
   function switchPlayMode() {
-    var playMode = GamePlayService.switchPlayMode();
-    $scope.switchText = playMode === GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
+    GamePlayService.switchPlayMode();
+    $scope.switchText = GamePlayService.getCurrentPlayMode === GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
     $scope.players = GamePlayService.getPlayers();
     $scope.grid = GamePlayService.getGrid();
     $scope.isGameOver = GamePlayService.isGameOver();

@@ -2,8 +2,7 @@
 
 app.factory('GamePlayService', function (GameConst, $q) {
 
-  // Service variables
-
+  // *** Service variables ***
   var grid;
   var isPlayer1Turn;
   var player1Start;
@@ -19,7 +18,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
     players: [player1, player2]
   };
 
-  // Service functions
+  // *** Service functions ***
   function getGrid() {
     if (!grid) { newGame(); }
     return grid;
@@ -66,7 +65,6 @@ app.factory('GamePlayService', function (GameConst, $q) {
       getCurrentPlayerMove();
       return;
     }
-    //save game points
     if (game.isGameOver) {
       if (game.isGameWon) {
         currentPlayer().addPoints(GameConst.WIN_POINT);
@@ -116,8 +114,11 @@ app.factory('GamePlayService', function (GameConst, $q) {
       _class: GameConst.NOUGHT_CLASS
     }, isBot);
   }
+  function getCurrentPlayMode() {
+    return gameMode.mode;
+  }
 
-  // returned API
+  // *** returned API ***
   return {
     getGrid: getGrid,
     getPlayers: getPlayers,
@@ -126,6 +127,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
     newGame: newGame,
     isGameOver: isGameOver,
     markHandler: markHandler,
-    switchPlayMode: switchPlayMode
+    switchPlayMode: switchPlayMode,
+    getCurrentPlayMode: getCurrentPlayMode
   };
 });

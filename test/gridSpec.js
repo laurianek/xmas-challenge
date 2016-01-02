@@ -93,7 +93,7 @@ describe("A Grid", function() {
   it('should returned a game won status when a move lead to a win',
     it_should_not_allow_to_be_marked_when_the_game_has_ended);
 
-  describe('has to check for win and', function () {
+  describe('when checking for a win,', function () {
 
     function lineWinTest(isRow) {
       var i, j, aGrid;
@@ -112,18 +112,22 @@ describe("A Grid", function() {
         expect(gameStatus).toBeTruthy();
         expect(gameStatus.isGameOver).toBe(true);
         expect(gameStatus.isGameWon).toBe(true);
+        isRow ?
+          expect(gameStatus.winType).toEqual(Grid.constant.HZ_WIN) :
+          expect(gameStatus.winType).toEqual(Grid.constant.VT_WIN);
+
       }
     }
 
-    it('should return a win for all horizontal win', function () {
+    it('should return a win for all horizontal win combinations', function () {
       lineWinTest(true);
     });
 
-    it('should return a win for all vertical win', function () {
+    it('should return a win for all vertical win combination', function () {
       lineWinTest(false);
     });
 
-    it('should return a win for all diagonal win', function () {
+    it('should return a win for all diagonal win combination', function () {
       var i, j;
       var lhsGrid = new Grid(3);
       var rhsGrid = new Grid(3);
@@ -145,12 +149,14 @@ describe("A Grid", function() {
       expect(gameStatus).toBeTruthy();
       expect(gameStatus.isGameOver).toBe(true);
       expect(gameStatus.isGameWon).toBe(true);
+      expect(gameStatus.winType).toEqual(Grid.constant.LHD_WIN);
 
       position = {row: 2, col: 0};
       gameStatus = rhsGrid.mark(position, marker);
       expect(gameStatus).toBeTruthy();
       expect(gameStatus.isGameOver).toBe(true);
       expect(gameStatus.isGameWon).toBe(true);
+      expect(gameStatus.winType).toEqual(Grid.constant.RHD_WIN);
     });
   })
 });
