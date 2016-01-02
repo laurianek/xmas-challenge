@@ -15,7 +15,7 @@ To setup locally please ensure that you have `node v0.12.2` or higher and `npm v
 This should be all set and ready to go. 
 Visit [localhost:5000](http://localhost:5000) 'et Voila'.
 
-Enjoy a game Noughts and Crosses!
+Have a go and enjoy the game!
 
 ## Features
 - 2 players in the same browser
