@@ -11,13 +11,7 @@
         "bower_components/angular/angular.js",
         "app/js/lib/arrayForEachPolyfill.js",
         "app/js/lib/arrayReducePolyfill.js",
-        "app/js/src/grid.js",
-        "app/js/src/player.js",
-        "app/js/src/app.js",
-        "app/js/src/gameconst.js",
-        "app/js/src/colourservice.js",
-        "app/js/src/gameplayservice.js",
-        "app/js/src/mainctrl.js"
+        "app/js/src/*"
       ],
       "test": [
         "bower_components/angular/angular.js",
