@@ -12,6 +12,12 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
   $scope.switchText = 'switch to multiplayer';
   $scope.replay = init;
   $scope.switchPlayMode = switchPlayMode;
+  $scope.isModalShown = false;
+  $scope.getOnlinePlayers = function(){}; //GamePlayService.geOnlinePlayers();
+  $scope.toggleModal = function(){
+    $scope.isModalShown = !$scope.isModalShown;
+  };
+
   init();
 
   function init() {

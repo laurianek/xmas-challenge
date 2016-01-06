@@ -19,10 +19,28 @@
   </script>
 </head>
 <body ng-controller="mainCtrl" class="container-fluid">
+<div class="multi-browser-modal-bg" ng-show="isModalShown" ng-click="toggleModal()" ng-cloak>
+  <div class="panel panel-info multi-browser-modal" ng-click="$event.stopPropagation();">
+    <div class="panel-heading">Players online</div>
+    <div class="panel-body">
+      <ul class="list-group">
+        <li class="list-group-item">ng-repeat ng-click</li>
+      </ul>
+    </div>
+  </div>
+</div>
 <div class="row">
   <div class="col-xs-12">
     <div class="well">
       <h1>Noughts and Crosses</h1>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <p class="bg-info clearfix multi-browser">
+          <span>Play with other people online NOW!</span>
+          <button class="btn btn-default pull-right" ng-click="toggleModal()">Play</button>
+        </p>
+      </div>
     </div>
 
     <div class="grid" ng-cloak>

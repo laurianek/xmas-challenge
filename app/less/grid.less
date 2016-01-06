@@ -5,7 +5,7 @@
   position: relative;
   width: 60%;
   min-width: 300px;
-  max-width: 500px;
+  max-width: @grid-max-width;
   margin: 0 auto;
   margin-bottom: 30px;
 
@@ -39,37 +39,4 @@
     width: 100%;
     background-color: rgba(223,240,216,.95);
   }
-}
-
-.player-info {
-  @media (min-width: 500px) {
-    width: 50%;
-    float: left;
-  }
-  .player-name {
-    border: none;
-    background: transparent;
-    &:focus, &:hover, &:active {
-      border-bottom: 1px solid;
-    }
-  }
-  .player-edit-name {
-    cursor: pointer;
-  }
-  .score {
-    font-weight: bold;
-    font-size: 130%;
-  }
-  .glyphicon-pencil {
-    font-size: 90%;
-    padding-left: 5px;
-  }
-  form {
-    display: inline-block;
-  }
-}
-
-.btn-switch {
-  margin-bottom: 15px;
-  text-transform: capitalize;
 }

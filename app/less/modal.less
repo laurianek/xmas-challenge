@@ -1,0 +1,32 @@
+.multi-browser {
+  display: table;
+  width: 100%;
+  padding: 5px 20px;
+  > span {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  &-modal {
+    &-bg {
+      position: absolute;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      background: rgba(0,0,0,0.3);
+    }
+
+    position: absolute;
+    width: 90%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 10%;
+    max-height: 80%;
+    max-width: @grid-max-width;
+  }
+}
+
+
