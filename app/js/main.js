@@ -29153,7 +29153,7 @@ app.constant('GameConst', {
 });
 'use strict';
 
-app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (GameConst, $q, SocketService) {
+app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope', function (GameConst, $q, SocketService, $rootScope) {
 
   // *** Service variables ***
   var grid;
@@ -29161,11 +29161,13 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (Ga
   var player1Start;
   var gameOutcomeMsg = '';
   var previousSolo;
+  var challengers = [];
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
   SocketService.onReceivePlayers(receivedPlayers);
+  SocketService.on('challenged', challenged);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -29293,6 +29295,20 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (Ga
     }
     return gameMode.onlinePlayers;
   }
+  function challengePlayer(player) {
+    SocketService.emit('challenge', { from: gameMode.sessionPlayer, to: player });
+  }
+  function challenged(data) {
+    console.log(data);
+    challengers.push(data);
+    $rootScope.$apply();
+  }
+  function hasBeenChallenged() {
+    return challengers.length;
+  }
+  function getChallengers() {
+    return challengers;
+  }
 
   // *** returned API ***
   return {
@@ -29306,7 +29322,10 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (Ga
     switchPlayMode: switchPlayMode,
     getCurrentPlayMode: getCurrentPlayMode,
     playerNameChanged: playerNameChanged,
-    getOnlinePlayers: getOnlinePlayers
+    getOnlinePlayers: getOnlinePlayers,
+    challengePlayer: challengePlayer,
+    hasBeenChallenged: hasBeenChallenged,
+    getChallengers: getChallengers
   };
 }]);
 'use strict';
@@ -29454,6 +29473,11 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
       $scope.onlinePlayers = GamePlayService.getOnlinePlayers();
     }
   };
+  $scope.challengePlayer = function (player) {
+    console.log('just challenged ' + player.name + '!');
+    GamePlayService.challengePlayer(player);
+    $scope.toggleModal();
+  };
 
   init();
 
@@ -29476,6 +29500,15 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
   }, function (newVal) {
     $scope.isGameOver = newVal;
     $scope.msg = GamePlayService.getGameOutcomeMsg();
+  });
+
+  $scope.$watch(function () {
+    return GamePlayService.hasBeenChallenged();
+  }, function (newVal) {
+    if (!newVal) {
+      return;
+    }
+    $scope.challengers = GamePlayService.getChallengers();
   });
 }]);
 'use strict';

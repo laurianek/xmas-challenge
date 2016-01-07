@@ -1,6 +1,6 @@
 'use strict';
 
-app.factory('GamePlayService', function (GameConst, $q, SocketService) {
+app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScope) {
 
   // *** Service variables ***
   var grid;
@@ -8,11 +8,13 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
   var player1Start;
   var gameOutcomeMsg = '';
   var previousSolo;
+  var challengers = [];
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
   SocketService.onReceivePlayers(receivedPlayers);
+  SocketService.on('challenged', challenged);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -139,6 +141,20 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
     }
     return gameMode.onlinePlayers;
   }
+  function challengePlayer(player) {
+    SocketService.emit('challenge', {from: gameMode.sessionPlayer, to: player});
+  }
+  function challenged(data) {
+    console.log(data);
+    challengers.push(data);
+    $rootScope.$apply();
+  }
+  function hasBeenChallenged() {
+    return challengers.length;
+  }
+  function getChallengers() {
+    return challengers;
+  }
 
   // *** returned API ***
   return {
@@ -152,6 +168,9 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
     switchPlayMode: switchPlayMode,
     getCurrentPlayMode: getCurrentPlayMode,
     playerNameChanged: playerNameChanged,
-    getOnlinePlayers: getOnlinePlayers
+    getOnlinePlayers: getOnlinePlayers,
+    challengePlayer: challengePlayer,
+    hasBeenChallenged: hasBeenChallenged,
+    getChallengers: getChallengers
   };
 });

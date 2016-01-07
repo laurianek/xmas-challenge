@@ -37,8 +37,31 @@ io.on('connection', function(socket) {
   socket.on('register player', function(data) {
     data.id = socket.id;
     players.push(data);
-    console.log('active players', activePlayers());
     io.sockets.emit('online player list', activePlayers());
+  });
+
+  socket.on('challenge', function (data) {
+    var toSocket = io.sockets.connected[data.to.id];
+    if (!toSocket) {
+      socket.emit('gone offline', data.to);
+      io.sockets.emit('online player list', activePlayers());
+      return;
+    }
+    toSocket.emit('challenged', data);
+  });
+
+  socket.on('accept challenge', function (data) {
+    var fromSocket = io.sockets.connected[data.from.id];
+    if (!fromSocket) {
+      socket.emit('gone offline', data.from);
+      io.sockets.emit('online player list', activePlayers());
+      return;
+    }
+    fromSocket.emit('challenge accepted', data);
+    socket.emit('challenge accepted', data);
+  });
+  socket.on('reject challenge', function (data) {
+
   });
 });
 

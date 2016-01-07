@@ -32,9 +32,10 @@
           <span>(me)</span>
           <player-edit-name player="players[0]"></player-edit-name>
         </div>
-        <button type="button" class="list-group-item" ng-repeat="player in onlinePlayers track by $index">
-          <i class="glyphicon glyphicon-user"></i>
-          ng-repeat ng-click
+        <button type="button" class="list-group-item" ng-repeat="player in onlinePlayers track by $index"
+            ng-click="challengePlayer(player)">
+          <span class="player-challenge"><i class="glyphicon glyphicon-user"></i>{{ player.name }}</span>
+          <span class="btn btn-default pull-right">Challenge</span>
         </button>
         <p ng-hide="onlinePlayers.length" class="nobody">No body online now…</p>
       </div>
@@ -48,9 +49,14 @@
     </div>
     <div class="row">
       <div class="col-xs-12">
-        <p class="bg-info clearfix multi-browser">
+        <p class="bg-info clearfix multi-browser" ng-show="!challengers || challengers.length == 0">
           <span>Play with other people online NOW!</span>
           <button class="btn btn-default pull-right" ng-click="toggleModal()">Find opponent</button>
+        </p>
+        <p class="bg-success clearfix multi-browser" ng-cloak ng-repeat="challenger in challengers track by $index">
+          <span>You've been challenge by {{challenger.from.name}}</span>
+          <button class="btn btn-default" ng-click="">Reject</button>&nbsp;
+          <button class="btn btn-success" ng-click="">Accept</button>
         </p>
       </div>
     </div>

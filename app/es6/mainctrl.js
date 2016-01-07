@@ -19,6 +19,11 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
       $scope.onlinePlayers = GamePlayService.getOnlinePlayers();
     }
   };
+  $scope.challengePlayer = function(player) {
+    console.log(`just challenged ${player.name}!`);
+    GamePlayService.challengePlayer(player);
+    $scope.toggleModal();
+  };
 
   init();
 
@@ -41,5 +46,14 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
   }, function (newVal) {
     $scope.isGameOver = newVal;
     $scope.msg = GamePlayService.getGameOutcomeMsg();
+  });
+
+  $scope.$watch(function () {
+    return GamePlayService.hasBeenChallenged();
+  }, function(newVal) {
+    if(!newVal) {
+      return;
+    }
+    $scope.challengers = GamePlayService.getChallengers();
   });
 });
