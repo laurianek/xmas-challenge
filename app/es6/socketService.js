@@ -19,8 +19,17 @@ app.factory('SocketService', function () {
     socket.emit(eventName, data);
     return true;
   }
+  function on(eventName, func) {
+    if (!socket) {
+      console.log('receive on request', eventName, func);
+      return false;
+    }
+    socket.on(eventName, func);
+    return true;
+  }
 
   return {
-    emit: emit
+    emit: emit,
+    on: on
   };
 });

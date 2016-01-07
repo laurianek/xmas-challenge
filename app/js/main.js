@@ -29165,11 +29165,13 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (Ga
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
+  SocketService.on('online player list', receivedPlayers);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
     sessionPlayer: player1,
-    players: [player1, player2]
+    players: [player1, player2],
+    onlinePlayers: []
   };
 
   // *** Service functions ***
@@ -29274,13 +29276,22 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (Ga
   }
   function playerNameChanged(player) {
     if (!player) {
-      console.log('called player change name but empty');
       return;
     }
     if (gameMode.mode === GameConst.SINGLE_PLAYER && player === gameMode.sessionPlayer) {
       SocketService.emit('register player', player1);
     }
     player.editName = false;
+  }
+  function receivedPlayers(data) {
+    console.log(data);
+    gameMode.onlinePlayers = data;
+  }
+  function getOnlinePlayers() {
+    if (gameMode.mode !== GameConst.SINGLE_PLAYER) {
+      return false;
+    }
+    return gameMode.onlinePlayers;
   }
 
   // *** returned API ***
@@ -29294,7 +29305,8 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (Ga
     markHandler: markHandler,
     switchPlayMode: switchPlayMode,
     getCurrentPlayMode: getCurrentPlayMode,
-    playerNameChanged: playerNameChanged
+    playerNameChanged: playerNameChanged,
+    getOnlinePlayers: getOnlinePlayers
   };
 }]);
 'use strict';
@@ -29436,9 +29448,11 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
   $scope.replay = init;
   $scope.switchPlayMode = switchPlayMode;
   $scope.isModalShown = false;
-  $scope.getOnlinePlayers = function () {}; //GamePlayService.getOnlinePlayers();
   $scope.toggleModal = function () {
     $scope.isModalShown = !$scope.isModalShown;
+    if ($scope.isModalShown) {
+      $scope.onlinePlayers = GamePlayService.getOnlinePlayers();
+    }
   };
 
   init();
@@ -29580,8 +29594,17 @@ app.factory('SocketService', function () {
     socket.emit(eventName, data);
     return true;
   }
+  function on(eventName, func) {
+    if (!socket) {
+      console.log('receive on request', eventName, func);
+      return false;
+    }
+    socket.on(eventName, func);
+    return true;
+  }
 
   return {
-    emit: emit
+    emit: emit,
+    on: on
   };
 });

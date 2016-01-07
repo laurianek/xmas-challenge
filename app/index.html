@@ -32,10 +32,11 @@
           <span>(me)</span>
           <player-edit-name player="players[0]"></player-edit-name>
         </div>
-        <button type="button" class="list-group-item">
+        <button type="button" class="list-group-item" ng-repeat="player in onlinePlayers">
           <i class="glyphicon glyphicon-user"></i>
           ng-repeat ng-click
         </button>
+        <p ng-hide="onlinePlayers.length" class="nobody">No body online now…</p>
       </div>
     </div>
   </div>

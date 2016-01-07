@@ -12,11 +12,13 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
+  SocketService.on('online player list', receivedPlayers);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
     sessionPlayer: player1,
-    players: [player1, player2]
+    players: [player1, player2],
+    onlinePlayers: []
   };
 
   // *** Service functions ***
@@ -120,13 +122,22 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
   }
   function playerNameChanged(player) {
     if(!player) {
-      console.log('called player change name but empty');
       return;
     }
     if (gameMode.mode === GameConst.SINGLE_PLAYER && player === gameMode.sessionPlayer) {
       SocketService.emit('register player', player1);
     }
     player.editName = false;
+  }
+  function receivedPlayers(data) {
+    console.log(data);
+    gameMode.onlinePlayers = data;
+  }
+  function getOnlinePlayers() {
+    if (gameMode.mode !== GameConst.SINGLE_PLAYER) {
+      return false;
+    }
+    return gameMode.onlinePlayers;
   }
 
   // *** returned API ***
@@ -140,6 +151,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
     markHandler: markHandler,
     switchPlayMode: switchPlayMode,
     getCurrentPlayMode: getCurrentPlayMode,
-    playerNameChanged: playerNameChanged
+    playerNameChanged: playerNameChanged,
+    getOnlinePlayers: getOnlinePlayers
   };
 });
