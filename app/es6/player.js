@@ -8,6 +8,7 @@ class Player {
     this.colour = colour;
     this.isBot = isBot;
     this.canPlay = false;
+    this.editName = false;
   }
 
   addPoints(_point) {

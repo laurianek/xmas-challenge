@@ -118,6 +118,16 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
   function getCurrentPlayMode() {
     return gameMode.mode;
   }
+  function playerNameChanged(player) {
+    if(!player) {
+      console.log('called player change name but empty');
+      return;
+    }
+    if (gameMode.mode === GameConst.SINGLE_PLAYER && player === gameMode.sessionPlayer) {
+      SocketService.emit('register player', player1);
+    }
+    player.editName = false;
+  }
 
   // *** returned API ***
   return {
@@ -129,6 +139,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
     isGameOver: isGameOver,
     markHandler: markHandler,
     switchPlayMode: switchPlayMode,
-    getCurrentPlayMode: getCurrentPlayMode
+    getCurrentPlayMode: getCurrentPlayMode,
+    playerNameChanged: playerNameChanged
   };
 });
