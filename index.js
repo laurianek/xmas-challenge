@@ -27,13 +27,20 @@ app.get('/', function(req, res) {
 initApp();
 
 var players = [];
+var playersInGame = {};
 
 io.on('connection', function(socket) {
   console.log('someone connected');
   socket.join('online free');
+
   socket.on('mark', function (data) {
-    io.sockets.emit('make the mark', {data: data, socketId: socket.id});
+    var sockets = data.sockets;
+    var position = data.position;
+    console.log(sockets, position);
+    io.sockets.connected[sockets[0]].emit('make the mark', position);
+    io.sockets.connected[sockets[1]].emit('make the mark', position);
   });
+
   socket.on('register player', function(data) {
     if(!data) {
       //some socket error handling here
@@ -70,6 +77,8 @@ io.on('connection', function(socket) {
       io.sockets.emit('online player list', activePlayers());
       return;
     }
+    playersInGame[data.from.id] = data.from;
+    playersInGame[data.to.id] = data.to;
     fromSocket.emit('challenge accepted', data);
     socket.emit('challenge accepted', data);
   });
@@ -91,7 +100,7 @@ io.on('connection', function(socket) {
 function activePlayers() {
   var newPlayerList = [];
   for (var i = 0; i < players.length; i++) {
-    if (io.sockets.connected[players[i].id]) {
+    if (io.sockets.connected[players[i].id] && !playersInGame[players[i].id]) {
       newPlayerList.push(players[i]);
     }
   }

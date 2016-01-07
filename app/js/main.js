@@ -29177,6 +29177,10 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   SocketService.on('challenged', challenged);
   SocketService.on('challenge rejected', rejectedChallenge);
   SocketService.onChallengeAccepted(startNewMultiBrowserGame);
+  SocketService.on('make the mark', function (position) {
+    mark(position);
+    $rootScope.$apply();
+  });
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -29200,6 +29204,7 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     player1Start = typeof player1Start === 'undefined' ? true : !player1Start;
     isPlayer1Turn = player1Start;
     gameOutcomeMsg = '';
+    console.log('get current player move', gameMode);
     getCurrentPlayerMove();
   }
   function changePlayer() {
@@ -29219,9 +29224,15 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
       currentPlayer().mark(row, col);
     } else if (gameMode.mode === GameConst.MULTI_PLAYER) {
       currentPlayer().mark(row, col);
+    } else if (gameMode.mode === GameConst.SOCKET_PLAYER && currentPlayer() === gameMode.sessionPlayer) {
+      SocketService.emit('mark', { position: { row: row, col: col }, sockets: gameMode.sockets });
     }
   }
   function getCurrentPlayerMove() {
+    if (gameMode.mode === GameConst.SOCKET_PLAYER) {
+      console.log('waiting for ' + currentPlayer().marker.symbol + ' to play...');
+      return;
+    }
     var playerDeferred = $q.defer();
     currentPlayer().setCanPlay(playerDeferred).then(function success(position) {
       mark(position);
@@ -29338,7 +29349,9 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
       player1Start = !isPlayer1Start;
       newSocketGame();
       gameMode = {
-        mode: GameConst.SOCKET_PLAYER
+        mode: GameConst.SOCKET_PLAYER,
+        sockets: getSocketIds(data),
+        sessionPlayer: player1
       };
       return GameConst.SOCKET_PLAYER;
     }
@@ -29360,6 +29373,9 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     $rootScope.hasChallenged = false;
     challenge = null;
     $rootScope.$apply();
+  }
+  function getSocketIds(data) {
+    return [data.from.id, data.to.id];
   }
 
   // *** returned API ***
@@ -29683,8 +29699,8 @@ app.directive('playerEditName', ['GamePlayService', function (GamePlayService) {
     scope: {
       player: '='
     },
-    template: '<span class="player-edit-name" ng-hide="player.editName" ng-click="editName()"> \
-                  <span>{{ player.name }}</span><i class="glyphicon glyphicon-pencil"></i> \
+    template: '<span class="player-edit-name" ng-hide="player.editName" ng-click="player.editName = true"> \
+                  <span>{{ player.name }}</span><i class="glyphicon glyphicon-pencil" ng-show="player.canEditName"></i> \
                 </span> \
                 <form ng-submit="changeName(player)" ng-show="player.editName"> \
                   <label class="sr-only" for="playerMe">enter your name</label> \
@@ -29692,11 +29708,6 @@ app.directive('playerEditName', ['GamePlayService', function (GamePlayService) {
                 </form>',
     link: function link(scope, el) {
       scope.changeName = GamePlayService.playerNameChanged;
-      scope.editName = function() {
-        if (scope.player.canEditName) {
-          scope.player.editName = true;
-        }
-      }
     }
   };
 }]);

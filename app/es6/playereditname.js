@@ -7,7 +7,7 @@ app.directive('playerEditName', function(GamePlayService) {
       player: '='
     },
     template: '<span class="player-edit-name" ng-hide="player.editName" ng-click="player.editName = true"> \
-                  <span>{{ player.name }}</span><i class="glyphicon glyphicon-pencil"></i> \
+                  <span>{{ player.name }}</span><i class="glyphicon glyphicon-pencil" ng-show="player.canEditName"></i> \
                 </span> \
                 <form ng-submit="changeName(player)" ng-show="player.editName"> \
                   <label class="sr-only" for="playerMe">enter your name</label> \

@@ -18,6 +18,10 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
   SocketService.on('challenged', challenged);
   SocketService.on('challenge rejected', rejectedChallenge);
   SocketService.onChallengeAccepted(startNewMultiBrowserGame);
+  SocketService.on('make the mark', function(position) {
+    mark(position);
+    $rootScope.$apply();
+  });
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -39,7 +43,8 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     player1Start = typeof(player1Start) === 'undefined' ? true : !player1Start;
     isPlayer1Turn = player1Start;
     gameOutcomeMsg = '';
-    getCurrentPlayerMove()
+    console.log('get current player move', gameMode);
+    getCurrentPlayerMove();
   }
   function changePlayer() {
     return isPlayer1Turn = !isPlayer1Turn;
@@ -60,8 +65,15 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     else if (gameMode.mode === GameConst.MULTI_PLAYER) {
       currentPlayer().mark(row, col);
     }
+    else if (gameMode.mode === GameConst.SOCKET_PLAYER && currentPlayer() === gameMode.sessionPlayer) {
+      SocketService.emit('mark', {position: {row: row, col: col}, sockets: gameMode.sockets});
+    }
   }
   function getCurrentPlayerMove() {
+    if (gameMode.mode === GameConst.SOCKET_PLAYER) {
+      console.log(`waiting for ${currentPlayer().marker.symbol} to play...`);
+      return;
+    }
     var playerDeferred = $q.defer();
     currentPlayer().setCanPlay(playerDeferred).then(function success(position) {
       mark(position);
@@ -178,7 +190,9 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
       player1Start = !isPlayer1Start;
       newSocketGame();
       gameMode = {
-        mode: GameConst.SOCKET_PLAYER
+        mode: GameConst.SOCKET_PLAYER,
+        sockets: getSocketIds(data),
+        sessionPlayer: player1
       };
       return GameConst.SOCKET_PLAYER;
     }
@@ -200,6 +214,9 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     $rootScope.hasChallenged = false;
     challenge = null;
     $rootScope.$apply();
+  }
+  function getSocketIds(data) {
+    return [data.from.id, data.to.id];
   }
 
   // *** returned API ***
