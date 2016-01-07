@@ -27,14 +27,22 @@ app.factory('SocketService', function (MakerConst) {
     socket.on(eventName, func);
     return true;
   }
+  function off() {
+    if (!socket) {
+      console.log('receive off request');
+      return false;
+    }
+    socket.off();
+    return true;
+  }
   function onReceivePlayers(callback) {
     if (!socket) {
       console.log('receive onReceivePlayers request', callback);
       return false;
     }
     socket.on('online player list', function (data) {
-      var currentPlayer = '/#' + socket.id;
       var playerList = [];
+      var currentPlayer = '/#' + socket.id;
       for (let i = 0; i < data.length; i++) {
         if (data[i].id == currentPlayer) {
           continue;
@@ -68,11 +76,27 @@ app.factory('SocketService', function (MakerConst) {
       callback(data, player1Start);
     });
   }
+  function onReplayWanted(callback) {
+    if (!socket) {
+      console.log('receive onReplayWanted request', callback);
+      return false;
+    }
+    var currentPlayer = '/#' + socket.id;
+    socket.on('replay wanted', function(data) {
+      var socket = data.from;
+      if (socket.id == currentPlayer) {
+        return;
+      }
+      callback();
+    });
+  }
 
   return {
     emit: emit,
     on: on,
+    off: off,
     onReceivePlayers: onReceivePlayers,
-    onChallengeAccepted: onChallengeAccepted
+    onChallengeAccepted: onChallengeAccepted,
+    onReplayWanted: onReplayWanted
   };
 });

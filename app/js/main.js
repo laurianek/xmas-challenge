@@ -29168,19 +29168,10 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   var gameOutcomeMsg = '';
   var previousSolo;
   var challenge;
-  var startedNewGame;
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
-  SocketService.emit('register player', player1);
-  SocketService.onReceivePlayers(receivedPlayers);
-  SocketService.on('challenged', challenged);
-  SocketService.on('challenge rejected', rejectedChallenge);
-  SocketService.onChallengeAccepted(startNewMultiBrowserGame);
-  SocketService.on('make the mark', function (position) {
-    mark(position);
-    $rootScope.$apply();
-  });
+  socketGameInit();
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -29267,6 +29258,7 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
       previousSolo = gameMode;
       player1 = getNewPlayer('Player 1', false);
       player2 = getNewPlayer('Player 2', true);
+      socketGameDestroy();
       newGame();
       gameMode = {
         mode: GameConst.MULTI_PLAYER
@@ -29277,6 +29269,7 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
       gameMode = previousSolo;
       player1 = gameMode.players[0];
       player2 = gameMode.players[1];
+      socketGameInit();
       newGame();
       return GameConst.SINGLE_PLAYER;
     }
@@ -29369,13 +29362,46 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   }
   function newSocketGame() {
     newGame();
-    $rootScope.newSocketGameStarted = true;
+    gameMode.replay = false;
+    $rootScope.newSocketGameStarted = $rootScope.newSocketGameStarted === true ? 1 : true;
     $rootScope.hasChallenged = false;
     challenge = null;
     $rootScope.$apply();
   }
   function getSocketIds(data) {
     return [data.from.id, data.to.id];
+  }
+  function socketGameInit() {
+    SocketService.emit('register player', player1);
+    SocketService.onReceivePlayers(receivedPlayers);
+    SocketService.on('challenged', challenged);
+    SocketService.on('challenge rejected', rejectedChallenge);
+    SocketService.onChallengeAccepted(startNewMultiBrowserGame);
+    SocketService.on('make the mark', function (position) {
+      mark(position);
+      $rootScope.$apply();
+    });
+    SocketService.onReplayWanted(function () {
+      console.log('received replay wanted...');
+      gameMode.replay = true;
+    });
+    SocketService.on('replay', function () {
+      console.log('received start new game ...');
+      newSocketGame();
+    });
+  }
+  function socketGameDestroy() {
+    SocketService.off();
+    SocketService.emit('unregister player', player1);
+  }
+  function replay() {
+    if (gameMode.replay) {
+      console.log('restarting game request...');
+      SocketService.emit('replay accepted', { sockets: gameMode.sockets });
+      return;
+    }
+    console.log('requesting replay...');
+    SocketService.emit('request replay', { sockets: gameMode.sockets });
   }
 
   // *** returned API ***
@@ -29395,7 +29421,8 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     hasBeenChallenged: hasBeenChallenged,
     getChallenger: getChallenger,
     rejectChallenge: rejectChallenge,
-    acceptChallenge: acceptChallenge
+    acceptChallenge: acceptChallenge,
+    replay: replay
   };
 }]);
 'use strict';
@@ -29573,6 +29600,10 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
   init();
 
   function init() {
+    if (GamePlayService.getCurrentPlayMode() == GameConst.SOCKET_PLAYER) {
+      GamePlayService.replay();
+      return;
+    }
     GamePlayService.newGame();
     $scope.grid = GamePlayService.getGrid();
     $scope.isGameOver = GamePlayService.isGameOver();
@@ -29699,7 +29730,7 @@ app.directive('playerEditName', ['GamePlayService', function (GamePlayService) {
     scope: {
       player: '='
     },
-    template: '<span class="player-edit-name" ng-hide="player.editName" ng-click="player.editName = true"> \
+    template: '<span class="player-edit-name" ng-hide="player.editName" ng-click="editName()"> \
                   <span>{{ player.name }}</span><i class="glyphicon glyphicon-pencil" ng-show="player.canEditName"></i> \
                 </span> \
                 <form ng-submit="changeName(player)" ng-show="player.editName"> \
@@ -29708,6 +29739,18 @@ app.directive('playerEditName', ['GamePlayService', function (GamePlayService) {
                 </form>',
     link: function link(scope, el) {
       scope.changeName = GamePlayService.playerNameChanged;
+      scope.editName = function () {
+        if (scope.player.canEditName) {
+          scope.player.editName = true;
+          var inputEl = el[0].getElementsByTagName('input')[0];
+          (function (input) {
+            setTimeout(function () {
+              input.focus();
+            }, 10);
+          })(inputEl);
+        }
+        console.log(el);
+      };
     }
   };
 }]);
@@ -29740,14 +29783,22 @@ app.factory('SocketService', ['MakerConst', function (MakerConst) {
     socket.on(eventName, func);
     return true;
   }
+  function off() {
+    if (!socket) {
+      console.log('receive off request');
+      return false;
+    }
+    socket.off();
+    return true;
+  }
   function onReceivePlayers(callback) {
     if (!socket) {
       console.log('receive onReceivePlayers request', callback);
       return false;
     }
     socket.on('online player list', function (data) {
-      var currentPlayer = '/#' + socket.id;
       var playerList = [];
+      var currentPlayer = '/#' + socket.id;
       for (var i = 0; i < data.length; i++) {
         if (data[i].id == currentPlayer) {
           continue;
@@ -29781,11 +29832,27 @@ app.factory('SocketService', ['MakerConst', function (MakerConst) {
       callback(data, player1Start);
     });
   }
+  function onReplayWanted(callback) {
+    if (!socket) {
+      console.log('receive onReplayWanted request', callback);
+      return false;
+    }
+    var currentPlayer = '/#' + socket.id;
+    socket.on('replay wanted', function (data) {
+      var socket = data.from;
+      if (socket.id == currentPlayer) {
+        return;
+      }
+      callback();
+    });
+  }
 
   return {
     emit: emit,
     on: on,
+    off: off,
     onReceivePlayers: onReceivePlayers,
-    onChallengeAccepted: onChallengeAccepted
+    onChallengeAccepted: onChallengeAccepted,
+    onReplayWanted: onReplayWanted
   };
 }]);

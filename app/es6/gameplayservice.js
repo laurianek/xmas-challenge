@@ -9,19 +9,10 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
   var gameOutcomeMsg = '';
   var previousSolo;
   var challenge;
-  var startedNewGame;
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
-  SocketService.emit('register player', player1);
-  SocketService.onReceivePlayers(receivedPlayers);
-  SocketService.on('challenged', challenged);
-  SocketService.on('challenge rejected', rejectedChallenge);
-  SocketService.onChallengeAccepted(startNewMultiBrowserGame);
-  SocketService.on('make the mark', function(position) {
-    mark(position);
-    $rootScope.$apply();
-  });
+  socketGameInit();
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -108,6 +99,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
       previousSolo = gameMode;
       player1 = getNewPlayer('Player 1', false);
       player2 = getNewPlayer('Player 2', true);
+      socketGameDestroy();
       newGame();
       gameMode = {
         mode: GameConst.MULTI_PLAYER
@@ -118,6 +110,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
       gameMode = previousSolo;
       player1 = gameMode.players[0];
       player2 = gameMode.players[1];
+      socketGameInit();
       newGame();
       return GameConst.SINGLE_PLAYER;
     }
@@ -210,13 +203,46 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
   }
   function newSocketGame() {
     newGame();
-    $rootScope.newSocketGameStarted = true;
+    gameMode.replay = false;
+    $rootScope.newSocketGameStarted = $rootScope.newSocketGameStarted === true ? 1 : true;
     $rootScope.hasChallenged = false;
     challenge = null;
     $rootScope.$apply();
   }
   function getSocketIds(data) {
     return [data.from.id, data.to.id];
+  }
+  function socketGameInit() {
+    SocketService.emit('register player', player1);
+    SocketService.onReceivePlayers(receivedPlayers);
+    SocketService.on('challenged', challenged);
+    SocketService.on('challenge rejected', rejectedChallenge);
+    SocketService.onChallengeAccepted(startNewMultiBrowserGame);
+    SocketService.on('make the mark', function(position) {
+      mark(position);
+      $rootScope.$apply();
+    });
+    SocketService.onReplayWanted(function() {
+      console.log('received replay wanted...');
+      gameMode.replay = true;
+    });
+    SocketService.on('replay', function() {
+      console.log('received start new game ...');
+      newSocketGame();
+    });
+  }
+  function socketGameDestroy() {
+    SocketService.off();
+    SocketService.emit('unregister player', player1);
+  }
+  function replay() {
+    if(gameMode.replay) {
+      console.log('restarting game request...');
+      SocketService.emit('replay accepted', {sockets: gameMode.sockets});
+      return;
+    }
+    console.log('requesting replay...');
+    SocketService.emit('request replay', {sockets: gameMode.sockets});
   }
 
   // *** returned API ***
@@ -236,6 +262,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     hasBeenChallenged: hasBeenChallenged,
     getChallenger: getChallenger,
     rejectChallenge: rejectChallenge,
-    acceptChallenge: acceptChallenge
+    acceptChallenge: acceptChallenge,
+    replay: replay
   };
 });

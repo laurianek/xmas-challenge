@@ -34,6 +34,10 @@ io.on('connection', function(socket) {
   socket.join('online free');
 
   socket.on('mark', function (data) {
+    if(!data) {
+      //some socket error handling here
+      return;
+    }
     var sockets = data.sockets;
     var position = data.position;
     console.log(sockets, position);
@@ -47,7 +51,9 @@ io.on('connection', function(socket) {
       return;
     }
     data.id = socket.id;
-    players.push(data);
+    var index = getPlayerIndex(socket.id);
+    index === -1? players.push(data) : players[index] = data;
+    console.log(players);
     io.sockets.emit('online player list', activePlayers());
   });
 
@@ -95,6 +101,27 @@ io.on('connection', function(socket) {
     }
     fromSocket.emit('challenge rejected', data);
   });
+
+  socket.on('replay accepted', function(data) {
+    if(!data) {
+      //some socket error handling here
+      return;
+    }
+    var sockets = data.sockets;
+    io.sockets.connected[sockets[0]].emit('replay');
+    io.sockets.connected[sockets[1]].emit('replay');
+  });
+
+  socket.on('request replay', function(data) {
+    if(!data) {
+      //some socket error handling here
+      return;
+    }
+    var sockets = data.sockets;
+    console.log('requested replay', sockets);
+    io.sockets.connected[sockets[0]].emit('replay wanted', {from: socket.id});
+    io.sockets.connected[sockets[1]].emit('replay wanted', {from: socket.id});
+  });
 });
 
 function activePlayers() {
@@ -106,4 +133,12 @@ function activePlayers() {
   }
   players = newPlayerList;
   return players;
+}
+function getPlayerIndex(id) {
+  for (var i = 0; i < players.length; i++) {
+    if (players[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
 }

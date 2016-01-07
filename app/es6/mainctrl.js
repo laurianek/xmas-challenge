@@ -49,6 +49,10 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
   init();
 
   function init() {
+    if(GamePlayService.getCurrentPlayMode() == GameConst.SOCKET_PLAYER) {
+      GamePlayService.replay();
+      return;
+    }
     GamePlayService.newGame();
     $scope.grid = GamePlayService.getGrid();
     $scope.isGameOver = GamePlayService.isGameOver();
