@@ -29165,7 +29165,7 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (Ga
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
-  SocketService.on('online player list', receivedPlayers);
+  SocketService.onReceivePlayers(receivedPlayers);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -29602,9 +29602,27 @@ app.factory('SocketService', function () {
     socket.on(eventName, func);
     return true;
   }
+  function onReceivePlayers(callback) {
+    if (!socket) {
+      console.log('receive onReceivePlayers request', callback);
+      return false;
+    }
+    socket.on('online player list', function (data) {
+      var currentPlayer = '/#' + socket.id;
+      var playerList = [];
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].id == currentPlayer) {
+          continue;
+        }
+        playerList.push(data[i]);
+      }
+      callback(playerList);
+    });
+  }
 
   return {
     emit: emit,
-    on: on
+    on: on,
+    onReceivePlayers: onReceivePlayers
   };
 });

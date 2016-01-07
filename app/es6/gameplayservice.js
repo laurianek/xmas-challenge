@@ -12,7 +12,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService) {
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
-  SocketService.on('online player list', receivedPlayers);
+  SocketService.onReceivePlayers(receivedPlayers);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,

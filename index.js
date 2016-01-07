@@ -26,8 +26,29 @@ app.get('/', function(req, res) {
 // Start app server
 initApp();
 
-io.on('connection', function (socket) {
+var players = [];
+
+io.on('connection', function(socket) {
+  console.log('someone connected');
+  socket.join('online free');
   socket.on('mark', function (data) {
     io.sockets.emit('make the mark', {data: data, socketId: socket.id});
   });
+  socket.on('register player', function(data) {
+    data.id = socket.id;
+    players.push(data);
+    console.log('active players', activePlayers());
+    io.sockets.emit('online player list', activePlayers());
+  });
 });
+
+function activePlayers() {
+  var newPlayerList = [];
+  for (var i = 0; i < players.length; i++) {
+    if (io.sockets.connected[players[i].id]) {
+      newPlayerList.push(players[i]);
+    }
+  }
+  players = newPlayerList;
+  return players;
+}

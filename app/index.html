@@ -32,7 +32,7 @@
           <span>(me)</span>
           <player-edit-name player="players[0]"></player-edit-name>
         </div>
-        <button type="button" class="list-group-item" ng-repeat="player in onlinePlayers">
+        <button type="button" class="list-group-item" ng-repeat="player in onlinePlayers track by $index">
           <i class="glyphicon glyphicon-user"></i>
           ng-repeat ng-click
         </button>
@@ -101,7 +101,7 @@
     </div>
   </div>
 </div>
-
+<script src="/socket.io/socket.io.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

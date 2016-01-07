@@ -27,9 +27,27 @@ app.factory('SocketService', function () {
     socket.on(eventName, func);
     return true;
   }
+  function onReceivePlayers(callback) {
+    if (!socket) {
+      console.log('receive onReceivePlayers request', callback);
+      return false;
+    }
+    socket.on('online player list', function (data) {
+      var currentPlayer = '/#' + socket.id;
+      var playerList = [];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].id == currentPlayer) {
+          continue;
+        }
+        playerList.push(data[i]);
+      }
+      callback(playerList);
+    });
+  }
 
   return {
     emit: emit,
-    on: on
+    on: on,
+    onReceivePlayers: onReceivePlayers
   };
 });

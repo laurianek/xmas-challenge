@@ -87,6 +87,20 @@ gulp.task('watch', function () {
     console.log('Event path: ' + event.path); // The path of the modified file
   }
 });
+gulp.task('watch:dist', function () {
+  gulp.watch(config.paths.buildConfig, ['config:reload']);
+  var jsWatcher = gulp.watch(config.paths.js.es6, ['dist:js']);
+  var cssWatcher = gulp.watch(config.paths.css, ['dist:css']);
+  var htmlWatcher = gulp.watch('app/*.html', ['dist:html']);
+  gulp.run('test:watch');
+  jsWatcher.on('change', watchLog);
+  cssWatcher.on('change', watchLog);
+  htmlWatcher.on('change', watchLog);
+  function watchLog(event) {
+    console.log('Event type: ' + event.type); // added, changed, or deleted
+    console.log('Event path: ' + event.path); // The path of the modified file
+  }
+});
 
 gulp.task('test:main', function(done) {
   new Server({
