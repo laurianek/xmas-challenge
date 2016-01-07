@@ -29110,37 +29110,6 @@ if (!Array.prototype.reduce) {
 var app = angular.module('tictactoe', []);
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-(function () {
-  var ColourService = (function () {
-    function ColourService() {
-      _classCallCheck(this, ColourService);
-    }
-
-    _createClass(ColourService, [{
-      key: 'getSymbolColour',
-      value: function getSymbolColour(obj, players) {
-        if (obj.player) {
-          return 'symbol-' + obj.player.colour;
-        }
-        if (obj.marker) {
-          var player = players[0].marker.symbol == obj.marker.symbol ? players[0] : players[1];
-          return 'symbol-' + player.colour;
-        }
-        return '';
-      }
-    }]);
-
-    return ColourService;
-  })();
-
-  app.service('ColourService', ColourService);
-})();
-'use strict';
-
 app.constant('GameConst', {
   NOUGHT: 'nought',
   CROSS: 'cross',
@@ -29151,140 +29120,6 @@ app.constant('GameConst', {
   SINGLE_PLAYER: 'single-player',
   MULTI_PLAYER: 'multy-player'
 });
-'use strict';
-
-app.factory('GamePlayService', ["GameConst", "$q", function (GameConst, $q) {
-
-  // *** Service variables ***
-  var grid;
-  var isPlayer1Turn;
-  var player1Start;
-  var gameOutcomeMsg = '';
-  var previousSolo;
-
-  var player1 = getNewPlayer('Player 1', false);
-  var player2 = getNewPlayer('Player 2 (bot)', true, true);
-
-  var gameMode = {
-    mode: GameConst.SINGLE_PLAYER,
-    sessionPlayer: player1,
-    players: [player1, player2]
-  };
-
-  // *** Service functions ***
-  function getGrid() {
-    if (!grid) {
-      newGame();
-    }
-    return grid;
-  }
-  function getPlayers() {
-    return [player1, player2];
-  }
-  function newGame() {
-    grid = new Grid();
-    player1Start = typeof player1Start === 'undefined' ? true : !player1Start;
-    isPlayer1Turn = player1Start;
-    gameOutcomeMsg = '';
-    getCurrentPlayerMove();
-  }
-  function changePlayer() {
-    return isPlayer1Turn = !isPlayer1Turn;
-  }
-  function currentPlayer() {
-    return isPlayer1Turn ? player1 : player2;
-  }
-  function isCurrentPlayer(player) {
-    return player.marker === currentPlayer().marker;
-  }
-  function isGameOver() {
-    return getGrid().gameOver;
-  }
-  function markHandler(row, col) {
-    if (gameMode.mode === GameConst.SINGLE_PLAYER && currentPlayer() === gameMode.sessionPlayer) {
-      currentPlayer().mark(row, col);
-    } else if (gameMode.mode === GameConst.MULTI_PLAYER) {
-      currentPlayer().mark(row, col);
-    }
-  }
-  function getCurrentPlayerMove() {
-    var playerDeferred = $q.defer();
-    currentPlayer().setCanPlay(playerDeferred).then(function success(position) {
-      mark(position);
-    });
-  }
-  function mark(position) {
-    var game = getGrid().mark(position, currentPlayer().marker);
-    if (!game) {
-      getCurrentPlayerMove();
-      return;
-    }
-    if (game.isGameOver) {
-      if (game.isGameWon) {
-        currentPlayer().addPoints(GameConst.WIN_POINT);
-        gameOutcomeMsg = currentPlayer().name + ' won this round!';
-        return;
-      }
-      getPlayers().forEach(function (player) {
-        player.addPoints(GameConst.DRAW_POINT);
-      });
-      gameOutcomeMsg = 'Draw!';
-      return;
-    }
-    changePlayer();
-    getCurrentPlayerMove();
-  }
-  function getGameOutcomeMsg() {
-    return gameOutcomeMsg;
-  }
-  function switchPlayMode() {
-    if (gameMode.mode === GameConst.SINGLE_PLAYER) {
-      previousSolo = gameMode;
-      player1 = getNewPlayer('Player 1', false);
-      player2 = getNewPlayer('Player 2', true);
-      newGame();
-      gameMode = {
-        mode: GameConst.MULTI_PLAYER
-      };
-      return GameConst.MULTI_PLAYER;
-    }
-    if (gameMode.mode === GameConst.MULTI_PLAYER) {
-      gameMode = previousSolo;
-      player1 = gameMode.players[0];
-      player2 = gameMode.players[1];
-      newGame();
-      return GameConst.SINGLE_PLAYER;
-    }
-  }
-  function getNewPlayer(name, isCross, isBot) {
-    if (isCross) {
-      return new Player(name, {
-        symbol: GameConst.CROSS,
-        _class: GameConst.CROSS_CLASS
-      }, isBot);
-    }
-    return new Player(name, {
-      symbol: GameConst.NOUGHT,
-      _class: GameConst.NOUGHT_CLASS
-    }, isBot);
-  }
-  function getCurrentPlayMode() {
-    return gameMode.mode;
-  }
-
-  // *** returned API ***
-  return {
-    getGrid: getGrid,
-    getPlayers: getPlayers,
-    getGameOutcomeMsg: getGameOutcomeMsg,
-    isCurrentPlayer: isCurrentPlayer,
-    newGame: newGame,
-    isGameOver: isGameOver,
-    markHandler: markHandler,
-    switchPlayMode: switchPlayMode,
-    getCurrentPlayMode: getCurrentPlayMode
-  };
-}]);
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -29411,49 +29246,6 @@ Grid.constant = {
 };
 'use strict';
 
-app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'ColourService', function ($scope, $q, GameConst, GamePlayService, ColourService) {
-  $scope.players = GamePlayService.getPlayers();
-  $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
-  $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
-  $scope.colours = Player.colourArray;
-  $scope.getSymbolColour = function (obj) {
-    return ColourService.getSymbolColour(obj, GamePlayService.getPlayers());
-  };
-  $scope.mark = GamePlayService.markHandler;
-  $scope.switchText = 'switch to multiplayer';
-  $scope.replay = init;
-  $scope.switchPlayMode = switchPlayMode;
-  $scope.isModalShown = false;
-  $scope.getOnlinePlayers = function () {}; //GamePlayService.geOnlinePlayers();
-  $scope.toggleModal = function () {
-    $scope.isModalShown = !$scope.isModalShown;
-  };
-
-  init();
-
-  function init() {
-    GamePlayService.newGame();
-    $scope.grid = GamePlayService.getGrid();
-    $scope.isGameOver = GamePlayService.isGameOver();
-  }
-
-  function switchPlayMode() {
-    GamePlayService.switchPlayMode();
-    $scope.switchText = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
-    $scope.players = GamePlayService.getPlayers();
-    $scope.grid = GamePlayService.getGrid();
-    $scope.isGameOver = GamePlayService.isGameOver();
-  }
-
-  $scope.$watch(function () {
-    return GamePlayService.isGameOver();
-  }, function (newVal) {
-    $scope.isGameOver = newVal;
-    $scope.msg = GamePlayService.getGameOutcomeMsg();
-  });
-}]);
-'use strict';
-
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -29526,3 +29318,238 @@ var Player = (function () {
 })();
 
 Player.colourArray = ['red', 'yellow', 'green', 'blue', 'pink'];
+'use strict';
+
+app.factory('SocketService', function () {
+  var socket;
+  init();
+
+  function init() {
+    if (typeof io === 'undefined') {
+      console.log('Error no socket');
+      return;
+    }
+    socket = io(location.origin);
+  }
+  function emit(eventName, data) {
+    if (!socket) {
+      console.log('receive emit request', eventName, data);
+      return false;
+    }
+    socket.emit(eventName, data);
+    return true;
+  }
+
+  return {
+    emit: emit
+  };
+});
+'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+  var ColourService = (function () {
+    function ColourService() {
+      _classCallCheck(this, ColourService);
+    }
+
+    _createClass(ColourService, [{
+      key: 'getSymbolColour',
+      value: function getSymbolColour(obj, players) {
+        if (obj.player) {
+          return 'symbol-' + obj.player.colour;
+        }
+        if (obj.marker) {
+          var player = players[0].marker.symbol == obj.marker.symbol ? players[0] : players[1];
+          return 'symbol-' + player.colour;
+        }
+        return '';
+      }
+    }]);
+
+    return ColourService;
+  })();
+
+  app.service('ColourService', ColourService);
+})();
+'use strict';
+
+app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', function (GameConst, $q, SocketService) {
+
+  // *** Service variables ***
+  var grid;
+  var isPlayer1Turn;
+  var player1Start;
+  var gameOutcomeMsg = '';
+  var previousSolo;
+
+  var player1 = getNewPlayer('Player 1', false);
+  var player2 = getNewPlayer('Player 2 (bot)', true, true);
+  SocketService.emit('register player', player1);
+
+  var gameMode = {
+    mode: GameConst.SINGLE_PLAYER,
+    sessionPlayer: player1,
+    players: [player1, player2]
+  };
+
+  // *** Service functions ***
+  function getGrid() {
+    if (!grid) {
+      newGame();
+    }
+    return grid;
+  }
+  function getPlayers() {
+    return [player1, player2];
+  }
+  function newGame() {
+    grid = new Grid();
+    player1Start = typeof player1Start === 'undefined' ? true : !player1Start;
+    isPlayer1Turn = player1Start;
+    gameOutcomeMsg = '';
+    getCurrentPlayerMove();
+  }
+  function changePlayer() {
+    return isPlayer1Turn = !isPlayer1Turn;
+  }
+  function currentPlayer() {
+    return isPlayer1Turn ? player1 : player2;
+  }
+  function isCurrentPlayer(player) {
+    return player.marker === currentPlayer().marker;
+  }
+  function isGameOver() {
+    return getGrid().gameOver;
+  }
+  function markHandler(row, col) {
+    if (gameMode.mode === GameConst.SINGLE_PLAYER && currentPlayer() === gameMode.sessionPlayer) {
+      currentPlayer().mark(row, col);
+    } else if (gameMode.mode === GameConst.MULTI_PLAYER) {
+      currentPlayer().mark(row, col);
+    }
+  }
+  function getCurrentPlayerMove() {
+    var playerDeferred = $q.defer();
+    currentPlayer().setCanPlay(playerDeferred).then(function success(position) {
+      mark(position);
+    });
+  }
+  function mark(position) {
+    var game = getGrid().mark(position, currentPlayer().marker);
+    if (!game) {
+      getCurrentPlayerMove();
+      return;
+    }
+    if (game.isGameOver) {
+      if (game.isGameWon) {
+        currentPlayer().addPoints(GameConst.WIN_POINT);
+        gameOutcomeMsg = currentPlayer().name + ' won this round!';
+        return;
+      }
+      getPlayers().forEach(function (player) {
+        player.addPoints(GameConst.DRAW_POINT);
+      });
+      gameOutcomeMsg = 'Draw!';
+      return;
+    }
+    changePlayer();
+    getCurrentPlayerMove();
+  }
+  function getGameOutcomeMsg() {
+    return gameOutcomeMsg;
+  }
+  function switchPlayMode() {
+    if (gameMode.mode === GameConst.SINGLE_PLAYER) {
+      previousSolo = gameMode;
+      player1 = getNewPlayer('Player 1', false);
+      player2 = getNewPlayer('Player 2', true);
+      newGame();
+      gameMode = {
+        mode: GameConst.MULTI_PLAYER
+      };
+      return GameConst.MULTI_PLAYER;
+    }
+    if (gameMode.mode === GameConst.MULTI_PLAYER) {
+      gameMode = previousSolo;
+      player1 = gameMode.players[0];
+      player2 = gameMode.players[1];
+      newGame();
+      return GameConst.SINGLE_PLAYER;
+    }
+  }
+  function getNewPlayer(name, isCross, isBot) {
+    if (isCross) {
+      return new Player(name, {
+        symbol: GameConst.CROSS,
+        _class: GameConst.CROSS_CLASS
+      }, isBot);
+    }
+    return new Player(name, {
+      symbol: GameConst.NOUGHT,
+      _class: GameConst.NOUGHT_CLASS
+    }, isBot);
+  }
+  function getCurrentPlayMode() {
+    return gameMode.mode;
+  }
+
+  // *** returned API ***
+  return {
+    getGrid: getGrid,
+    getPlayers: getPlayers,
+    getGameOutcomeMsg: getGameOutcomeMsg,
+    isCurrentPlayer: isCurrentPlayer,
+    newGame: newGame,
+    isGameOver: isGameOver,
+    markHandler: markHandler,
+    switchPlayMode: switchPlayMode,
+    getCurrentPlayMode: getCurrentPlayMode
+  };
+}]);
+'use strict';
+
+app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'ColourService', function ($scope, $q, GameConst, GamePlayService, ColourService) {
+  $scope.players = GamePlayService.getPlayers();
+  $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
+  $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
+  $scope.colours = Player.colourArray;
+  $scope.getSymbolColour = function (obj) {
+    return ColourService.getSymbolColour(obj, GamePlayService.getPlayers());
+  };
+  $scope.mark = GamePlayService.markHandler;
+  $scope.switchText = 'switch to multiplayer';
+  $scope.replay = init;
+  $scope.switchPlayMode = switchPlayMode;
+  $scope.isModalShown = false;
+  $scope.getOnlinePlayers = function () {}; //GamePlayService.getOnlinePlayers();
+  $scope.toggleModal = function () {
+    $scope.isModalShown = !$scope.isModalShown;
+  };
+
+  init();
+
+  function init() {
+    GamePlayService.newGame();
+    $scope.grid = GamePlayService.getGrid();
+    $scope.isGameOver = GamePlayService.isGameOver();
+  }
+
+  function switchPlayMode() {
+    GamePlayService.switchPlayMode();
+    $scope.switchText = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
+    $scope.players = GamePlayService.getPlayers();
+    $scope.grid = GamePlayService.getGrid();
+    $scope.isGameOver = GamePlayService.isGameOver();
+  }
+
+  $scope.$watch(function () {
+    return GamePlayService.isGameOver();
+  }, function (newVal) {
+    $scope.isGameOver = newVal;
+    $scope.msg = GamePlayService.getGameOutcomeMsg();
+  });
+}]);

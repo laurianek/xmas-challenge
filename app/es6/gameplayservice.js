@@ -1,6 +1,6 @@
 'use strict';
 
-app.factory('GamePlayService', function (GameConst, $q) {
+app.factory('GamePlayService', function (GameConst, $q, SocketService) {
 
   // *** Service variables ***
   var grid;
@@ -11,6 +11,7 @@ app.factory('GamePlayService', function (GameConst, $q) {
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
+  SocketService.emit('register player', player1);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,

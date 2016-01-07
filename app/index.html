@@ -21,11 +21,28 @@
 <body ng-controller="mainCtrl" class="container-fluid">
 <div class="multi-browser-modal-bg" ng-show="isModalShown" ng-click="toggleModal()" ng-cloak>
   <div class="panel panel-info multi-browser-modal" ng-click="$event.stopPropagation();">
-    <div class="panel-heading">Players online</div>
+    <div class="panel-heading">
+      Players online
+      <button type="button" class="close" aria-label="Close" ng-click="toggleModal()"><span aria-hidden="true">&times;</span></button>
+    </div>
     <div class="panel-body">
-      <ul class="list-group">
-        <li class="list-group-item">ng-repeat ng-click</li>
-      </ul>
+      <div class="list-group">
+        <div class="list-group-item player-info">
+          <i class="glyphicon glyphicon-user"></i>
+          <span>(me)</span>
+          <span class="player-edit-name" ng-hide="players[0].editName" ng-click="players[0].editName = true">
+            <span>{{ players[0].name }}</span><i class="glyphicon glyphicon-pencil"></i>
+          </span>
+          <form ng-submit="players[0].editName = false" ng-show="players[0].editName">
+            <label class="sr-only" for="playerMe">enter your name</label>
+            <input type="text" class="player-name" id="playerMe" ng-model="players[0].name">
+          </form>
+        </div>
+        <button type="button" class="list-group-item">
+          <i class="glyphicon glyphicon-user"></i>
+          ng-repeat ng-click
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -38,7 +55,7 @@
       <div class="col-xs-12">
         <p class="bg-info clearfix multi-browser">
           <span>Play with other people online NOW!</span>
-          <button class="btn btn-default pull-right" ng-click="toggleModal()">Play</button>
+          <button class="btn btn-default pull-right" ng-click="toggleModal()">Find opponent</button>
         </p>
       </div>
     </div>
