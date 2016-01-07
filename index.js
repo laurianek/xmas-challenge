@@ -35,12 +35,20 @@ io.on('connection', function(socket) {
     io.sockets.emit('make the mark', {data: data, socketId: socket.id});
   });
   socket.on('register player', function(data) {
+    if(!data) {
+      //some socket error handling here
+      return;
+    }
     data.id = socket.id;
     players.push(data);
     io.sockets.emit('online player list', activePlayers());
   });
 
   socket.on('challenge', function (data) {
+    if(!data) {
+      //some socket error handling here
+      return;
+    }
     var toSocket = io.sockets.connected[data.to.id];
     if (!toSocket) {
       socket.emit('gone offline', data.to);
@@ -52,6 +60,10 @@ io.on('connection', function(socket) {
   });
 
   socket.on('accept challenge', function (data) {
+    if(!data) {
+      //some socket error handling here
+      return;
+    }
     var fromSocket = io.sockets.connected[data.from.id];
     if (!fromSocket) {
       socket.emit('gone offline', data.from);
@@ -61,8 +73,10 @@ io.on('connection', function(socket) {
     fromSocket.emit('challenge accepted', data);
     socket.emit('challenge accepted', data);
   });
+
   socket.on('reject challenge', function (data) {
     if(!data) {
+      //some socket error handling here
       return;
     }
     var fromSocket = io.sockets.connected[data.from.id];

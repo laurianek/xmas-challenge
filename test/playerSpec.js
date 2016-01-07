@@ -67,7 +67,7 @@ describe("A Player", function() {
 
   it("should have its turn reset", function() {
     expect(player.canPlay).toBeFalsy();
-    player.setCanPlay({promise: 'stub promise'});
+    player.setCanPlay({promise: 'stub promise', resolve: function(){}, reject: function(){}});
     expect(player.canPlay).toBeTruthy();
     player.reset();
     expect(player.canPlay).toBeFalsy();

@@ -1,6 +1,6 @@
 'use strict';
 
-app.factory('SocketService', function () {
+app.factory('SocketService', function (MakerConst) {
   var socket;
   init();
 
@@ -44,10 +44,35 @@ app.factory('SocketService', function () {
       callback(playerList);
     });
   }
+  function onChallengeAccepted(callback){
+    if (!socket) {
+      console.log('receive onChallengeAccepted request', callback);
+      return false;
+    }
+    socket.on('challenge accepted', function (data) {
+      var currentPlayer = '/#' + socket.id;
+      if (data.from.id == currentPlayer) {
+        data.from.isCurrentPlayer = true;
+        data.from.marker = MakerConst.NOUGHT_MARKER;
+        data.to.isCurrentPlayer = false;
+        data.to.marker = MakerConst.CROSS_MARKER;
+        var player1Start = true;
+        callback(data, player1Start);
+        return;
+      }
+      data.from.isCurrentPlayer = false;
+      data.from.marker = MakerConst.NOUGHT_MARKER;
+      data.to.isCurrentPlayer = true;
+      data.to.marker = MakerConst.CROSS_MARKER;
+      var player1Start = false;
+      callback(data, player1Start);
+    });
+  }
 
   return {
     emit: emit,
     on: on,
-    onReceivePlayers: onReceivePlayers
+    onReceivePlayers: onReceivePlayers,
+    onChallengeAccepted: onChallengeAccepted
   };
 });

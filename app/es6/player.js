@@ -9,6 +9,7 @@ class Player {
     this.isBot = isBot;
     this.canPlay = false;
     this.editName = false;
+    this.canEditName = true;
   }
 
   addPoints(_point) {
@@ -49,6 +50,9 @@ class Player {
   }
 
   reset() {
+    if (this.canPlay) {
+      this.canPlay.reject();
+    }
     this.canPlay = false;
   }
 }

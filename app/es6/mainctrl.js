@@ -1,6 +1,7 @@
 'use strict';
 
 app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, ColourService, $rootScope) {
+  var isMultiPlay = false;
   $scope.players = GamePlayService.getPlayers();
   $scope.config = {colour: 'colour', symbol: 'marker', score: 'score'};
   $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
@@ -26,17 +27,23 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
     $scope.toggleModal();
   };
   $scope.showInfo = function() {
-    return !$rootScope.hasChallenged && !$scope.challenger;
+    return !isMultiPlay && !$rootScope.hasChallenged && !$scope.challenger && !$rootScope.newSocketGameStarted;
   };
   $scope.showIsChallenged = function() {
-    return GamePlayService.hasBeenChallenged();
+    return !isMultiPlay && GamePlayService.hasBeenChallenged();
   };
   $scope.showHasChallenged = function() {
-    return $rootScope.hasChallenged;
+    return !isMultiPlay && $rootScope.hasChallenged;
+  };
+  $scope.showNewGame = function() {
+    return !isMultiPlay && $rootScope.newSocketGameStarted;
   };
   $scope.rejectChallenge = function() {
     GamePlayService.rejectChallenge();
     $scope.challenger = GamePlayService.getChallenger();
+  };
+  $scope.acceptChallenge = function() {
+    GamePlayService.acceptChallenge();
   };
 
   init();
@@ -49,7 +56,8 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
 
   function switchPlayMode() {
     GamePlayService.switchPlayMode();
-    $scope.switchText = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
+    isMultiPlay = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER;
+    $scope.switchText = isMultiPlay ? 'switch to soloplay' : 'switch to multiplayer';
     $scope.players = GamePlayService.getPlayers();
     $scope.grid = GamePlayService.getGrid();
     $scope.isGameOver = GamePlayService.isGameOver();
@@ -69,5 +77,14 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
       return;
     }
     $scope.challenger = GamePlayService.getChallenger();
+  });
+
+  $scope.$watch('newSocketGameStarted', function(newVal) {
+    if(newVal) {
+      isMultiPlay = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER;
+      $scope.players = GamePlayService.getPlayers();
+      $scope.grid = GamePlayService.getGrid();
+      $scope.isGameOver = GamePlayService.isGameOver();
+    }
   });
 });

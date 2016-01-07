@@ -29142,18 +29142,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 'use strict';
 
 app.constant('GameConst', {
+  WIN_POINT: 1,
+  DRAW_POINT: 0.5,
+  SINGLE_PLAYER: 'single-player',
+  MULTI_PLAYER: 'multy-player',
+  SOCKET_PLAYER: 'socket-player'
+});
+
+app.constant('MakerConst', {
   NOUGHT: 'nought',
   CROSS: 'cross',
   NOUGHT_CLASS: 'symbol-nought',
   CROSS_CLASS: 'symbol-cross',
-  WIN_POINT: 1,
-  DRAW_POINT: 0.5,
-  SINGLE_PLAYER: 'single-player',
-  MULTI_PLAYER: 'multy-player'
+  NOUGHT_MARKER: { symbol: 'nought', _class: 'symbol-nought' },
+  CROSS_MARKER: { symbol: 'cross', _class: 'symbol-cross' }
 });
 'use strict';
 
-app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope', function (GameConst, $q, SocketService, $rootScope) {
+app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope', 'MakerConst', function (GameConst, $q, SocketService, $rootScope, MakerConst) {
 
   // *** Service variables ***
   var grid;
@@ -29162,6 +29168,7 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   var gameOutcomeMsg = '';
   var previousSolo;
   var challenge;
+  var startedNewGame;
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
@@ -29169,6 +29176,7 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   SocketService.onReceivePlayers(receivedPlayers);
   SocketService.on('challenged', challenged);
   SocketService.on('challenge rejected', rejectedChallenge);
+  SocketService.onChallengeAccepted(startNewMultiBrowserGame);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -29264,15 +29272,9 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   }
   function getNewPlayer(name, isCross, isBot) {
     if (isCross) {
-      return new Player(name, {
-        symbol: GameConst.CROSS,
-        _class: GameConst.CROSS_CLASS
-      }, isBot);
+      return new Player(name, MakerConst.CROSS_MARKER, isBot);
     }
-    return new Player(name, {
-      symbol: GameConst.NOUGHT,
-      _class: GameConst.NOUGHT_CLASS
-    }, isBot);
+    return new Player(name, MakerConst.NOUGHT_MARKER, isBot);
   }
   function getCurrentPlayMode() {
     return gameMode.mode;
@@ -29323,6 +29325,42 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     SocketService.emit('reject challenge', challenge);
     challenge = null;
   }
+  function acceptChallenge() {
+    SocketService.emit('accept challenge', challenge);
+  }
+  function startNewMultiBrowserGame(data, isPlayer1Start) {
+    console.log('started new socket game', gameMode);
+    if (gameMode.mode === GameConst.SINGLE_PLAYER) {
+      console.log('configs...');
+      previousSolo = gameMode;
+      resetPlayer1(data);
+      preparePlayer2(data);
+      player1Start = !isPlayer1Start;
+      newSocketGame();
+      gameMode = {
+        mode: GameConst.SOCKET_PLAYER
+      };
+      return GameConst.SOCKET_PLAYER;
+    }
+  }
+  function resetPlayer1(data) {
+    var _player1 = data.to.isCurrentPlayer ? data.to : data.from;
+    player1.score = 0;
+    player1.marker = _player1.marker;
+    player1.reset();
+  }
+  function preparePlayer2(data) {
+    var _player2 = data.to.isCurrentPlayer == false ? data.to : data.from;
+    player2 = new Player(_player2.name, _player2.marker, false, 0, _player2.colour);
+    player2.canEditName = false;
+  }
+  function newSocketGame() {
+    newGame();
+    $rootScope.newSocketGameStarted = true;
+    $rootScope.hasChallenged = false;
+    challenge = null;
+    $rootScope.$apply();
+  }
 
   // *** returned API ***
   return {
@@ -29340,7 +29378,8 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     challengePlayer: challengePlayer,
     hasBeenChallenged: hasBeenChallenged,
     getChallenger: getChallenger,
-    rejectChallenge: rejectChallenge
+    rejectChallenge: rejectChallenge,
+    acceptChallenge: acceptChallenge
   };
 }]);
 'use strict';
@@ -29470,6 +29509,7 @@ Grid.constant = {
 'use strict';
 
 app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'ColourService', '$rootScope', function ($scope, $q, GameConst, GamePlayService, ColourService, $rootScope) {
+  var isMultiPlay = false;
   $scope.players = GamePlayService.getPlayers();
   $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
   $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
@@ -29495,17 +29535,23 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
     $scope.toggleModal();
   };
   $scope.showInfo = function () {
-    return !$rootScope.hasChallenged && !$scope.challenger;
+    return !isMultiPlay && !$rootScope.hasChallenged && !$scope.challenger && !$rootScope.newSocketGameStarted;
   };
   $scope.showIsChallenged = function () {
-    return GamePlayService.hasBeenChallenged();
+    return !isMultiPlay && GamePlayService.hasBeenChallenged();
   };
   $scope.showHasChallenged = function () {
-    return $rootScope.hasChallenged;
+    return !isMultiPlay && $rootScope.hasChallenged;
+  };
+  $scope.showNewGame = function () {
+    return !isMultiPlay && $rootScope.newSocketGameStarted;
   };
   $scope.rejectChallenge = function () {
     GamePlayService.rejectChallenge();
     $scope.challenger = GamePlayService.getChallenger();
+  };
+  $scope.acceptChallenge = function () {
+    GamePlayService.acceptChallenge();
   };
 
   init();
@@ -29518,7 +29564,8 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
 
   function switchPlayMode() {
     GamePlayService.switchPlayMode();
-    $scope.switchText = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER ? 'switch to soloplay' : 'switch to multiplayer';
+    isMultiPlay = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER;
+    $scope.switchText = isMultiPlay ? 'switch to soloplay' : 'switch to multiplayer';
     $scope.players = GamePlayService.getPlayers();
     $scope.grid = GamePlayService.getGrid();
     $scope.isGameOver = GamePlayService.isGameOver();
@@ -29538,6 +29585,15 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
       return;
     }
     $scope.challenger = GamePlayService.getChallenger();
+  });
+
+  $scope.$watch('newSocketGameStarted', function (newVal) {
+    if (newVal) {
+      isMultiPlay = GamePlayService.getCurrentPlayMode() == GameConst.MULTI_PLAYER;
+      $scope.players = GamePlayService.getPlayers();
+      $scope.grid = GamePlayService.getGrid();
+      $scope.isGameOver = GamePlayService.isGameOver();
+    }
   });
 }]);
 'use strict';
@@ -29561,6 +29617,7 @@ var Player = (function () {
     this.isBot = isBot;
     this.canPlay = false;
     this.editName = false;
+    this.canEditName = true;
   }
 
   _createClass(Player, [{
@@ -29594,6 +29651,9 @@ var Player = (function () {
   }, {
     key: 'reset',
     value: function reset() {
+      if (this.canPlay) {
+        this.canPlay.reject();
+      }
       this.canPlay = false;
     }
   }], [{
@@ -29623,7 +29683,7 @@ app.directive('playerEditName', ['GamePlayService', function (GamePlayService) {
     scope: {
       player: '='
     },
-    template: '<span class="player-edit-name" ng-hide="player.editName" ng-click="player.editName = true"> \
+    template: '<span class="player-edit-name" ng-hide="player.editName" ng-click="editName()"> \
                   <span>{{ player.name }}</span><i class="glyphicon glyphicon-pencil"></i> \
                 </span> \
                 <form ng-submit="changeName(player)" ng-show="player.editName"> \
@@ -29632,12 +29692,17 @@ app.directive('playerEditName', ['GamePlayService', function (GamePlayService) {
                 </form>',
     link: function link(scope, el) {
       scope.changeName = GamePlayService.playerNameChanged;
+      scope.editName = function() {
+        if (scope.player.canEditName) {
+          scope.player.editName = true;
+        }
+      }
     }
   };
 }]);
 'use strict';
 
-app.factory('SocketService', function () {
+app.factory('SocketService', ['MakerConst', function (MakerConst) {
   var socket;
   init();
 
@@ -29681,10 +29746,35 @@ app.factory('SocketService', function () {
       callback(playerList);
     });
   }
+  function onChallengeAccepted(callback) {
+    if (!socket) {
+      console.log('receive onChallengeAccepted request', callback);
+      return false;
+    }
+    socket.on('challenge accepted', function (data) {
+      var currentPlayer = '/#' + socket.id;
+      if (data.from.id == currentPlayer) {
+        data.from.isCurrentPlayer = true;
+        data.from.marker = MakerConst.NOUGHT_MARKER;
+        data.to.isCurrentPlayer = false;
+        data.to.marker = MakerConst.CROSS_MARKER;
+        var player1Start = true;
+        callback(data, player1Start);
+        return;
+      }
+      data.from.isCurrentPlayer = false;
+      data.from.marker = MakerConst.NOUGHT_MARKER;
+      data.to.isCurrentPlayer = true;
+      data.to.marker = MakerConst.CROSS_MARKER;
+      var player1Start = false;
+      callback(data, player1Start);
+    });
+  }
 
   return {
     emit: emit,
     on: on,
-    onReceivePlayers: onReceivePlayers
+    onReceivePlayers: onReceivePlayers,
+    onChallengeAccepted: onChallengeAccepted
   };
-});
+}]);
