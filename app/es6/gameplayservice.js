@@ -8,13 +8,14 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
   var player1Start;
   var gameOutcomeMsg = '';
   var previousSolo;
-  var challengers = [];
+  var challenge;
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
   SocketService.onReceivePlayers(receivedPlayers);
   SocketService.on('challenged', challenged);
+  SocketService.on('challenge rejected', rejectedChallenge)
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -146,14 +147,27 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
   }
   function challenged(data) {
     console.log(data);
-    challengers.push(data);
+    if (challenge) {
+      rejectChallenge()
+    }
+    challenge = data;
     $rootScope.$apply();
   }
   function hasBeenChallenged() {
-    return challengers.length;
+    return challenge;
   }
-  function getChallengers() {
-    return challengers;
+  function getChallenger() {
+    return challenge;
+  }
+  function rejectedChallenge(data) {
+    console.log(data);
+    $rootScope.hasChallenged = false;
+    $rootScope.$apply();
+  }
+  function rejectChallenge() {
+    console.log('rejected challenge');
+    SocketService.emit('reject challenge', challenge);
+    challenge = null;
   }
 
   // *** returned API ***
@@ -171,6 +185,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     getOnlinePlayers: getOnlinePlayers,
     challengePlayer: challengePlayer,
     hasBeenChallenged: hasBeenChallenged,
-    getChallengers: getChallengers
+    getChallenger: getChallenger,
+    rejectChallenge: rejectChallenge
   };
 });

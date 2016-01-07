@@ -47,6 +47,7 @@ io.on('connection', function(socket) {
       io.sockets.emit('online player list', activePlayers());
       return;
     }
+    data.from.id = socket.id;
     toSocket.emit('challenged', data);
   });
 
@@ -61,7 +62,15 @@ io.on('connection', function(socket) {
     socket.emit('challenge accepted', data);
   });
   socket.on('reject challenge', function (data) {
-
+    if(!data) {
+      return;
+    }
+    var fromSocket = io.sockets.connected[data.from.id];
+    if (!fromSocket) {
+      io.sockets.emit('online player list', activePlayers());
+      return;
+    }
+    fromSocket.emit('challenge rejected', data);
   });
 });
 

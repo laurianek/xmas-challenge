@@ -29161,13 +29161,14 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   var player1Start;
   var gameOutcomeMsg = '';
   var previousSolo;
-  var challengers = [];
+  var challenge;
 
   var player1 = getNewPlayer('Player 1', false);
   var player2 = getNewPlayer('Player 2 (bot)', true, true);
   SocketService.emit('register player', player1);
   SocketService.onReceivePlayers(receivedPlayers);
   SocketService.on('challenged', challenged);
+  SocketService.on('challenge rejected', rejectedChallenge);
 
   var gameMode = {
     mode: GameConst.SINGLE_PLAYER,
@@ -29300,14 +29301,27 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
   }
   function challenged(data) {
     console.log(data);
-    challengers.push(data);
+    if (challenge) {
+      rejectChallenge();
+    }
+    challenge = data;
     $rootScope.$apply();
   }
   function hasBeenChallenged() {
-    return challengers.length;
+    return challenge;
   }
-  function getChallengers() {
-    return challengers;
+  function getChallenger() {
+    return challenge;
+  }
+  function rejectedChallenge(data) {
+    console.log(data);
+    $rootScope.hasChallenged = false;
+    $rootScope.$apply();
+  }
+  function rejectChallenge() {
+    console.log('rejected challenge');
+    SocketService.emit('reject challenge', challenge);
+    challenge = null;
   }
 
   // *** returned API ***
@@ -29325,7 +29339,8 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     getOnlinePlayers: getOnlinePlayers,
     challengePlayer: challengePlayer,
     hasBeenChallenged: hasBeenChallenged,
-    getChallengers: getChallengers
+    getChallenger: getChallenger,
+    rejectChallenge: rejectChallenge
   };
 }]);
 'use strict';
@@ -29454,7 +29469,7 @@ Grid.constant = {
 };
 'use strict';
 
-app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'ColourService', function ($scope, $q, GameConst, GamePlayService, ColourService) {
+app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'ColourService', '$rootScope', function ($scope, $q, GameConst, GamePlayService, ColourService, $rootScope) {
   $scope.players = GamePlayService.getPlayers();
   $scope.config = { colour: 'colour', symbol: 'marker', score: 'score' };
   $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
@@ -29476,7 +29491,21 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
   $scope.challengePlayer = function (player) {
     console.log('just challenged ' + player.name + '!');
     GamePlayService.challengePlayer(player);
+    $rootScope.hasChallenged = player;
     $scope.toggleModal();
+  };
+  $scope.showInfo = function () {
+    return !$rootScope.hasChallenged && !$scope.challenger;
+  };
+  $scope.showIsChallenged = function () {
+    return GamePlayService.hasBeenChallenged();
+  };
+  $scope.showHasChallenged = function () {
+    return $rootScope.hasChallenged;
+  };
+  $scope.rejectChallenge = function () {
+    GamePlayService.rejectChallenge();
+    $scope.challenger = GamePlayService.getChallenger();
   };
 
   init();
@@ -29508,7 +29537,7 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
     if (!newVal) {
       return;
     }
-    $scope.challengers = GamePlayService.getChallengers();
+    $scope.challenger = GamePlayService.getChallenger();
   });
 }]);
 'use strict';

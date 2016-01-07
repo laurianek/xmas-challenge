@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, ColourService) {
+app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, ColourService, $rootScope) {
   $scope.players = GamePlayService.getPlayers();
   $scope.config = {colour: 'colour', symbol: 'marker', score: 'score'};
   $scope.isCurrentPlayer = GamePlayService.isCurrentPlayer;
@@ -22,7 +22,21 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
   $scope.challengePlayer = function(player) {
     console.log(`just challenged ${player.name}!`);
     GamePlayService.challengePlayer(player);
+    $rootScope.hasChallenged = player;
     $scope.toggleModal();
+  };
+  $scope.showInfo = function() {
+    return !$rootScope.hasChallenged && !$scope.challenger;
+  };
+  $scope.showIsChallenged = function() {
+    return GamePlayService.hasBeenChallenged();
+  };
+  $scope.showHasChallenged = function() {
+    return $rootScope.hasChallenged;
+  };
+  $scope.rejectChallenge = function() {
+    GamePlayService.rejectChallenge();
+    $scope.challenger = GamePlayService.getChallenger();
   };
 
   init();
@@ -54,6 +68,6 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
     if(!newVal) {
       return;
     }
-    $scope.challengers = GamePlayService.getChallengers();
+    $scope.challenger = GamePlayService.getChallenger();
   });
 });

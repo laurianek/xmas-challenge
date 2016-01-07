@@ -49,14 +49,18 @@
     </div>
     <div class="row">
       <div class="col-xs-12">
-        <p class="bg-info clearfix multi-browser" ng-show="!challengers || challengers.length == 0">
+        <p class="bg-info clearfix multi-browser" ng-show="showInfo()">
           <span>Play with other people online NOW!</span>
           <button class="btn btn-default pull-right" ng-click="toggleModal()">Find opponent</button>
         </p>
-        <p class="bg-success clearfix multi-browser" ng-cloak ng-repeat="challenger in challengers track by $index">
+        <p class="bg-success clearfix multi-browser" ng-cloak ng-show="showIsChallenged()">
           <span>You've been challenge by {{challenger.from.name}}</span>
-          <button class="btn btn-default" ng-click="">Reject</button>&nbsp;
+          <button class="btn btn-default" ng-click="rejectChallenge()">Reject</button>&nbsp;
           <button class="btn btn-success" ng-click="">Accept</button>
+        </p>
+        <p class="bg-warning clearfix multi-browser" ng-cloak ng-show="showHasChallenged()">
+          <span>You've just challenge {{ hasChallenged.name }}</span>
+          <button class="btn btn-default pull-right" ng-click="">Cancel challenge</button>
         </p>
       </div>
     </div>
