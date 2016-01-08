@@ -21,7 +21,6 @@ app.directive('playerEditName', function(GamePlayService) {
           var inputEl = el[0].getElementsByTagName('input')[0];
           (function(input) {setTimeout(function() {input.focus();}, 10)})(inputEl);
         }
-        console.log(el);
       }
     }
   };

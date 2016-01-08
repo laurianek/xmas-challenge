@@ -78,7 +78,7 @@
       <div class="grid-msg bg-success text-center" ng-show="isGameOver">
         <h2>{{ msg }}</h2>
         <button class="btn btn-success btn-lg" ng-click="replay()" ng-hide="requestedReplay">Replay</button>
-        <p ng-show="requestedReplay">Waiting for {{ player[1].name }} for replay...</p>
+        <p ng-show="requestedReplay">Waiting for {{ players[1].name }} replay...</p>
       </div>
     </div>
 
@@ -106,7 +106,7 @@
         <p>{{ config.score }}: <span class="score">{{ player.score }} pts</span></p>
         <p>{{ config.colour }}:
           <button class="colour-pick colour-pick-{{colour}} text-hide"
-                  ng-repeat="colour in colours" ng-click="player.colour = colour"
+                  ng-repeat="colour in colours" ng-click="updatePlayerColour(player, colour)"
                   ng-class="{'colour-pick-active': player.colour == colour}">
             {{ colour }}
           </button>

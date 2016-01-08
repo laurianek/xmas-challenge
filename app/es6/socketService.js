@@ -81,13 +81,30 @@ app.factory('SocketService', function (MakerConst) {
       console.log('receive onReplayWanted request', callback);
       return false;
     }
-    var currentPlayer = '/#' + socket.id;
+
     socket.on('replay wanted', function(data) {
+      var currentPlayer = '/#' + socket.id;
       var socketFrom = data.from;
-      if (socketFrom.id == currentPlayer) {
+      if (socketFrom == currentPlayer) {
         return;
       }
+      console.log('receive onReplayWanted', currentPlayer, socketFrom);
       callback();
+    });
+  }
+  function onPlayerUpdate(callback) {
+    if (!socket) {
+      console.log('receive onPlayerUpdate request', callback);
+      return false;
+    }
+    socket.on('update player', function(data) {
+      var currentPlayer = '/#' + socket.id;
+      var socketFrom = data.from;
+      if (socketFrom == currentPlayer) {
+        return;
+      }
+      console.log('receive onPlayerUpdate', data.player, currentPlayer, socketFrom);
+      callback(data.player);
     });
   }
 
@@ -97,6 +114,7 @@ app.factory('SocketService', function (MakerConst) {
     off: off,
     onReceivePlayers: onReceivePlayers,
     onChallengeAccepted: onChallengeAccepted,
-    onReplayWanted: onReplayWanted
+    onReplayWanted: onReplayWanted,
+    onPlayerUpdate: onPlayerUpdate
   };
 });

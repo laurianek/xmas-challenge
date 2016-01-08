@@ -45,6 +45,7 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
   $scope.acceptChallenge = function() {
     GamePlayService.acceptChallenge();
   };
+  $scope.updatePlayerColour = GamePlayService.updatePlayerColour;
 
   init();
 
@@ -91,6 +92,12 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
       $scope.grid = GamePlayService.getGrid();
       $scope.isGameOver = GamePlayService.isGameOver();
       $scope.requestedReplay = false;
+    }
+  });
+
+  $scope.$watch('playerUpdated', function(newVal) {
+    if (newVal) {
+      $scope.players = GamePlayService.getPlayers();
     }
   });
 });

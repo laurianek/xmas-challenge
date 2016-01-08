@@ -131,6 +131,9 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     if (gameMode.mode === GameConst.SINGLE_PLAYER && player === gameMode.sessionPlayer) {
       SocketService.emit('register player', player1);
     }
+    if (gameMode.mode === GameConst.SOCKET_PLAYER && player === gameMode.sessionPlayer) {
+      SocketService.emit('update player', {player: player, sockets: gameMode.sockets})
+    }
     player.editName = false;
   }
   function receivedPlayers(data) {
@@ -230,6 +233,12 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
       console.log('received start new game ...');
       newSocketGame();
     });
+    SocketService.onPlayerUpdate(function(player) {
+      player2.name = player.name;
+      player2.colour = player.colour;
+      $rootScope.playerUpdated = $rootScope.playerUpdated === true ? 1 : true;
+      $rootScope.$apply();
+    });
   }
   function socketGameDestroy() {
     SocketService.off();
@@ -243,6 +252,17 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     }
     console.log('requesting replay...');
     SocketService.emit('request replay', {sockets: gameMode.sockets});
+  }
+  function updatePlayerColour(player, colour) {
+    if (gameMode.mode !== GameConst.SOCKET_PLAYER) {
+      player.colour = colour;
+      return;
+    }
+    if (player !== gameMode.sessionPlayer) {
+      return;
+    }
+    player.colour = colour;
+    SocketService.emit('update player', {player: player, sockets: gameMode.sockets});
   }
 
   // *** returned API ***
@@ -263,6 +283,7 @@ app.factory('GamePlayService', function (GameConst, $q, SocketService, $rootScop
     getChallenger: getChallenger,
     rejectChallenge: rejectChallenge,
     acceptChallenge: acceptChallenge,
-    replay: replay
+    replay: replay,
+    updatePlayerColour: updatePlayerColour
   };
 });

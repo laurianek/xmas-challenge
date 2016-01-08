@@ -29290,6 +29290,9 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     if (gameMode.mode === GameConst.SINGLE_PLAYER && player === gameMode.sessionPlayer) {
       SocketService.emit('register player', player1);
     }
+    if (gameMode.mode === GameConst.SOCKET_PLAYER && player === gameMode.sessionPlayer) {
+      SocketService.emit('update player', { player: player, sockets: gameMode.sockets });
+    }
     player.editName = false;
   }
   function receivedPlayers(data) {
@@ -29389,6 +29392,12 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
       console.log('received start new game ...');
       newSocketGame();
     });
+    SocketService.onPlayerUpdate(function (player) {
+      player2.name = player.name;
+      player2.colour = player.colour;
+      $rootScope.playerUpdated = $rootScope.playerUpdated === true ? 1 : true;
+      $rootScope.$apply();
+    });
   }
   function socketGameDestroy() {
     SocketService.off();
@@ -29402,6 +29411,17 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     }
     console.log('requesting replay...');
     SocketService.emit('request replay', { sockets: gameMode.sockets });
+  }
+  function updatePlayerColour(player, colour) {
+    if (gameMode.mode !== GameConst.SOCKET_PLAYER) {
+      player.colour = colour;
+      return;
+    }
+    if (player !== gameMode.sessionPlayer) {
+      return;
+    }
+    player.colour = colour;
+    SocketService.emit('update player', { player: player, sockets: gameMode.sockets });
   }
 
   // *** returned API ***
@@ -29422,7 +29442,8 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     getChallenger: getChallenger,
     rejectChallenge: rejectChallenge,
     acceptChallenge: acceptChallenge,
-    replay: replay
+    replay: replay,
+    updatePlayerColour: updatePlayerColour
   };
 }]);
 'use strict';
@@ -29596,6 +29617,7 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
   $scope.acceptChallenge = function () {
     GamePlayService.acceptChallenge();
   };
+  $scope.updatePlayerColour = GamePlayService.updatePlayerColour;
 
   init();
 
@@ -29642,6 +29664,12 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
       $scope.grid = GamePlayService.getGrid();
       $scope.isGameOver = GamePlayService.isGameOver();
       $scope.requestedReplay = false;
+    }
+  });
+
+  $scope.$watch('playerUpdated', function (newVal) {
+    if (newVal) {
+      $scope.players = GamePlayService.getPlayers();
     }
   });
 }]);
@@ -29751,7 +29779,6 @@ app.directive('playerEditName', ['GamePlayService', function (GamePlayService) {
             }, 10);
           })(inputEl);
         }
-        console.log(el);
       };
     }
   };
@@ -29839,13 +29866,30 @@ app.factory('SocketService', ['MakerConst', function (MakerConst) {
       console.log('receive onReplayWanted request', callback);
       return false;
     }
-    var currentPlayer = '/#' + socket.id;
+
     socket.on('replay wanted', function (data) {
+      var currentPlayer = '/#' + socket.id;
       var socketFrom = data.from;
-      if (socketFrom.id == currentPlayer) {
+      if (socketFrom == currentPlayer) {
         return;
       }
+      console.log('receive onReplayWanted', currentPlayer, socketFrom);
       callback();
+    });
+  }
+  function onPlayerUpdate(callback) {
+    if (!socket) {
+      console.log('receive onPlayerUpdate request', callback);
+      return false;
+    }
+    socket.on('update player', function (data) {
+      var currentPlayer = '/#' + socket.id;
+      var socketFrom = data.from;
+      if (socketFrom == currentPlayer) {
+        return;
+      }
+      console.log('receive onPlayerUpdate', data.player, currentPlayer, socketFrom);
+      callback(data.player);
     });
   }
 
@@ -29855,6 +29899,7 @@ app.factory('SocketService', ['MakerConst', function (MakerConst) {
     off: off,
     onReceivePlayers: onReceivePlayers,
     onChallengeAccepted: onChallengeAccepted,
-    onReplayWanted: onReplayWanted
+    onReplayWanted: onReplayWanted,
+    onPlayerUpdate: onPlayerUpdate
   };
 }]);

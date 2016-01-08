@@ -118,10 +118,21 @@ io.on('connection', function(socket) {
       return;
     }
     var sockets = data.sockets;
-    console.log('requested replay', sockets);
     io.sockets.connected[sockets[0]].emit('replay wanted', {from: socket.id});
     io.sockets.connected[sockets[1]].emit('replay wanted', {from: socket.id});
   });
+
+  socket.on('update player', function(data) {
+    if(!data) {
+      //some socket error handling here
+      return;
+    }
+    var sockets = data.sockets;
+    var player = data.player;
+    io.sockets.connected[sockets[0]].emit('update player', {from: socket.id, player: player});
+    io.sockets.connected[sockets[1]].emit('update player', {from: socket.id, player: player});
+  });
+
 });
 
 function activePlayers() {
