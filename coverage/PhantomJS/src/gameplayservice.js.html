@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">63.64% </span>
+        <span class="strong">59.69% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>112/176</span>
+        <span class='fraction'>114/191</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">46% </span>
+        <span class="strong">38.33% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>23/50</span>
+        <span class='fraction'>23/60</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">52.63% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>20/38</span>
+        <span class='fraction'>20/40</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">63.64% </span>
+        <span class="strong">59.69% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>112/176</span>
+        <span class='fraction'>114/191</span>
       </div>
     </div>
   </div>
@@ -310,7 +310,28 @@
 265
 266
 267
-268</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -444,6 +465,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -542,6 +566,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">3×</span>
@@ -550,6 +580,17 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -559,6 +600,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -710,6 +752,9 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
 <span class="cstat-no" title="statement not covered" >    if (gameMode.mode === GameConst.SINGLE_PLAYER &amp;&amp; player === gameMode.sessionPlayer) {</span>
 <span class="cstat-no" title="statement not covered" >      SocketService.emit('register player', player1);</span>
     }
+<span class="cstat-no" title="statement not covered" >    if (gameMode.mode === GameConst.SOCKET_PLAYER &amp;&amp; player === gameMode.sessionPlayer) {</span>
+<span class="cstat-no" title="statement not covered" >      SocketService.emit('update player', { player: player, sockets: gameMode.sockets });</span>
+    }
 <span class="cstat-no" title="statement not covered" >    player.editName = false;</span>
   }
 <span class="fstat-no" title="function not covered" >  function receivedPlayers(data) {</span>
@@ -809,6 +854,12 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
 <span class="cstat-no" title="statement not covered" >      console.log('received start new game ...');</span>
 <span class="cstat-no" title="statement not covered" >      newSocketGame();</span>
     });
+    SocketService.onPlayerUpdate(<span class="fstat-no" title="function not covered" >function (player) {</span>
+<span class="cstat-no" title="statement not covered" >      player2.name = player.name;</span>
+<span class="cstat-no" title="statement not covered" >      player2.colour = player.colour;</span>
+<span class="cstat-no" title="statement not covered" >      $rootScope.playerUpdated = $rootScope.playerUpdated === true ? 1 : true;</span>
+<span class="cstat-no" title="statement not covered" >      $rootScope.$apply();</span>
+    });
   }
   function socketGameDestroy() {
     SocketService.off();
@@ -822,6 +873,17 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     }
 <span class="cstat-no" title="statement not covered" >    console.log('requesting replay...');</span>
 <span class="cstat-no" title="statement not covered" >    SocketService.emit('request replay', { sockets: gameMode.sockets });</span>
+  }
+<span class="fstat-no" title="function not covered" >  function updatePlayerColour(player, colour) {</span>
+<span class="cstat-no" title="statement not covered" >    if (gameMode.mode !== GameConst.SOCKET_PLAYER) {</span>
+<span class="cstat-no" title="statement not covered" >      player.colour = colour;</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (player !== gameMode.sessionPlayer) {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
+<span class="cstat-no" title="statement not covered" >    player.colour = colour;</span>
+<span class="cstat-no" title="statement not covered" >    SocketService.emit('update player', { player: player, sockets: gameMode.sockets });</span>
   }
 &nbsp;
   // *** returned API ***
@@ -842,7 +904,8 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
     getChallenger: getChallenger,
     rejectChallenge: rejectChallenge,
     acceptChallenge: acceptChallenge,
-    replay: replay
+    replay: replay,
+    updatePlayerColour: updatePlayerColour
   };
 }]);</pre></td></tr>
 </table></pre>
@@ -850,7 +913,7 @@ app.factory('GamePlayService', ['GameConst', '$q', 'SocketService', '$rootScope'
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jan 07 2016 22:02:37 GMT+0000 (GMT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jan 08 2016 07:26:43 GMT+0000 (GMT)
 </div>
 </div>
 <script src="../prettify.js"></script>
