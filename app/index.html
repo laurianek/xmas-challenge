@@ -77,7 +77,8 @@
       </div>
       <div class="grid-msg bg-success text-center" ng-show="isGameOver">
         <h2>{{ msg }}</h2>
-        <button class="btn btn-success btn-lg" ng-click="replay()">Replay</button>
+        <button class="btn btn-success btn-lg" ng-click="replay()" ng-hide="requestedReplay">Replay</button>
+        <p ng-show="requestedReplay">Waiting for {{ player[1].name }} for replay...</p>
       </div>
     </div>
 

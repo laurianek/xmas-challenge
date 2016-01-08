@@ -83,8 +83,8 @@ app.factory('SocketService', function (MakerConst) {
     }
     var currentPlayer = '/#' + socket.id;
     socket.on('replay wanted', function(data) {
-      var socket = data.from;
-      if (socket.id == currentPlayer) {
+      var socketFrom = data.from;
+      if (socketFrom.id == currentPlayer) {
         return;
       }
       callback();

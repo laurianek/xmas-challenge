@@ -29602,6 +29602,7 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
   function init() {
     if (GamePlayService.getCurrentPlayMode() == GameConst.SOCKET_PLAYER) {
       GamePlayService.replay();
+      $scope.requestedReplay = true;
       return;
     }
     GamePlayService.newGame();
@@ -29640,6 +29641,7 @@ app.controller('mainCtrl', ['$scope', '$q', 'GameConst', 'GamePlayService', 'Col
       $scope.players = GamePlayService.getPlayers();
       $scope.grid = GamePlayService.getGrid();
       $scope.isGameOver = GamePlayService.isGameOver();
+      $scope.requestedReplay = false;
     }
   });
 }]);
@@ -29839,8 +29841,8 @@ app.factory('SocketService', ['MakerConst', function (MakerConst) {
     }
     var currentPlayer = '/#' + socket.id;
     socket.on('replay wanted', function (data) {
-      var socket = data.from;
-      if (socket.id == currentPlayer) {
+      var socketFrom = data.from;
+      if (socketFrom.id == currentPlayer) {
         return;
       }
       callback();

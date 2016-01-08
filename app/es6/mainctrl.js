@@ -51,6 +51,7 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
   function init() {
     if(GamePlayService.getCurrentPlayMode() == GameConst.SOCKET_PLAYER) {
       GamePlayService.replay();
+      $scope.requestedReplay = true;
       return;
     }
     GamePlayService.newGame();
@@ -89,6 +90,7 @@ app.controller('mainCtrl', function ($scope, $q, GameConst, GamePlayService, Col
       $scope.players = GamePlayService.getPlayers();
       $scope.grid = GamePlayService.getGrid();
       $scope.isGameOver = GamePlayService.isGameOver();
+      $scope.requestedReplay = false;
     }
   });
 });
