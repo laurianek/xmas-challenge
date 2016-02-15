@@ -18,7 +18,7 @@ Visit [localhost:5000](http://localhost:5000) 'et Voila'.
 Have a go and enjoy the game!
 
 ## Features
-- 2 players in the same browser
+- 2 players on different device
 - Play against the 'LUCK' bot
 - Toggle between Multiplayer and Solo mode
 - Alternate starting player
@@ -28,5 +28,4 @@ Have a go and enjoy the game!
 - Changing your name and see it when you Win, (you can change the bot name too)
 - See all my commits in this git repos 
 - unit / behaviour tests 
-- coverage **above 90%**
 - Automatic deployments from git repository
